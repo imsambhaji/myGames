@@ -1,0 +1,777 @@
+<title>Asmi's Maths Term 4</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&family=Nunito:wght@400;600;700;800&display=swap">
+<style>
+/* Layout: one column "workbook". Level switch at top; each level has 3 units of 3 lessons, then review.
+   A lesson opens as its own view: parent script, diagram, worked examples, then a practice round. */
+:root{
+  --bg:#f2f5f0; --card:#ffffff; --ink:#1c2a27; --muted:#56665f; --line:#d6dfd8;
+  --gum:#2d7a67; --gum-ink:#1f5c4d; --gum-soft:#dcefe7;
+  --wattle:#e9a91c; --wattle-ink:#94660a; --wattle-soft:#fcefcc;
+  --sky:#3a78bd; --sky-soft:#dde8f5;
+  --coral:#d4593f; --coral-soft:#fae2db;
+  --water:#8cc2ea; --cube:#e07a5f;
+  --c1:#2d7a67; --c2:#e9a91c; --c3:#3a78bd; --c4:#d4593f; --c5:#8a5cb8;
+  --f-display:"Fredoka","Trebuchet MS",system-ui,sans-serif;
+  --f-body:"Nunito","Segoe UI",system-ui,sans-serif;
+  --r:14px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#111c19; --card:#1a2925; --ink:#e7efeb; --muted:#9db0a8; --line:#2c3e39;
+  --gum:#5cbfa3; --gum-ink:#8fd8c2; --gum-soft:#1d3a33;
+  --wattle:#f2bf4b; --wattle-ink:#f5cd6f; --wattle-soft:#3a311c;
+  --sky:#7eb0e6; --sky-soft:#1d2e42;
+  --coral:#ef8a72; --coral-soft:#3d241f;
+  --water:#3f7fae; --cube:#d9775e;
+  --c1:#5cbfa3; --c2:#f2bf4b; --c3:#7eb0e6; --c4:#ef8a72; --c5:#b48fe0;
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#111c19; --card:#1a2925; --ink:#e7efeb; --muted:#9db0a8; --line:#2c3e39;
+  --gum:#5cbfa3; --gum-ink:#8fd8c2; --gum-soft:#1d3a33;
+  --wattle:#f2bf4b; --wattle-ink:#f5cd6f; --wattle-soft:#3a311c;
+  --sky:#7eb0e6; --sky-soft:#1d2e42;
+  --coral:#ef8a72; --coral-soft:#3d241f;
+  --water:#3f7fae; --cube:#d9775e;
+  --c1:#5cbfa3; --c2:#f2bf4b; --c3:#7eb0e6; --c4:#ef8a72; --c5:#b48fe0;
+  color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:17px;line-height:1.55;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 60px}
+.wrap{max-width:860px;margin:0 auto;display:flex;flex-direction:column;gap:22px}
+h1,h2,h3{font-family:var(--f-display);font-weight:600;line-height:1.2;text-wrap:balance;margin:0}
+h1{font-size:clamp(28px,6vw,40px)}
+h2{font-size:24px}
+h3{font-size:19px}
+p{margin:0}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid var(--sky);outline-offset:2px}
+.muted{color:var(--muted)}
+.eyebrow{font-size:12px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:var(--gum-ink)}
+
+/* header */
+header{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:14px}
+.hello{display:flex;flex-direction:column;gap:4px}
+.stars{display:flex;align-items:center;gap:8px;background:var(--wattle-soft);color:var(--wattle-ink);padding:8px 14px;border-radius:999px;font-weight:800;font-variant-numeric:tabular-nums}
+.stars svg{width:22px;height:22px}
+.switch{display:flex;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:4px;gap:4px;flex-wrap:wrap}
+.switch button{border:0;background:transparent;padding:8px 16px;border-radius:999px;font-weight:700;color:var(--muted)}
+.switch button[aria-pressed="true"]{background:var(--gum);color:var(--card)}
+.toolbar{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between}
+.tabs{display:flex;gap:18px;border-bottom:2px solid var(--line)}
+.tabs button{border:0;background:none;padding:6px 2px 10px;font-weight:800;color:var(--muted);margin-bottom:-2px;border-bottom:3px solid transparent}
+.tabs button[aria-selected="true"]{color:var(--ink);border-color:var(--wattle)}
+
+/* level intro */
+.intro{background:var(--gum-soft);border-radius:var(--r);padding:18px 20px;display:flex;flex-direction:column;gap:6px}
+.intro p{max-width:62ch}
+
+/* units */
+.unit{display:flex;flex-direction:column;gap:12px}
+.unit-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
+.lessons{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.lesson{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px;text-align:left;display:flex;flex-direction:column;gap:8px;transition:transform .15s,border-color .15s}
+.lesson:hover{transform:translateY(-2px);border-color:var(--gum)}
+.lesson .num{font-family:var(--f-display);font-size:14px;color:var(--gum-ink);font-weight:600}
+.lesson .t{font-weight:800;font-size:17px;line-height:1.3}
+.lesson .d{font-size:14px;color:var(--muted);flex:1}
+.lesson .row{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--muted)}
+.lesson.review{background:var(--wattle-soft);border-color:transparent}
+.lesson.review .num{color:var(--wattle-ink)}
+.mini-stars{display:inline-flex;gap:2px}
+.mini-stars svg{width:16px;height:16px}
+
+/* lesson view */
+.back{align-self:flex-start;border:1px solid var(--line);background:var(--card);border-radius:999px;padding:6px 14px;font-weight:700;font-size:15px}
+.lesson-title{display:flex;flex-direction:column;gap:6px}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:20px;display:flex;flex-direction:column;gap:14px;min-width:0}
+.say{background:var(--sky-soft);border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:6px}
+.say .lab{font-size:12px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:var(--sky)}
+.say p{max-width:65ch}
+.facts{background:var(--wattle-soft);border-radius:12px;padding:14px 16px}
+.facts ul{margin:6px 0 0;padding-left:20px}
+.diagram{display:flex;justify-content:center;overflow-x:auto}
+.diagram svg{max-width:100%;height:auto}
+.caption{font-size:14px;color:var(--muted);text-align:center}
+.examples{display:flex;flex-direction:column;gap:10px}
+details.ex{border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+details.ex summary{cursor:pointer;font-weight:700;list-style:none;display:flex;gap:10px}
+details.ex summary::-webkit-details-marker{display:none}
+details.ex summary .tag{flex:none;font-size:12px;font-weight:800;background:var(--gum-soft);color:var(--gum-ink);border-radius:6px;padding:2px 8px;height:fit-content;margin-top:2px}
+details.ex .sol{margin-top:10px;padding-top:10px;border-top:1px dashed var(--line)}
+details.ex .reveal{font-size:13px;color:var(--muted);font-weight:600;margin-left:auto;flex:none}
+details.ex[open] .reveal{display:none}
+.yourturn{background:var(--gum-soft);border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:6px}
+.yourturn .lab{font-size:12px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:var(--gum-ink)}
+.hands ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:4px}
+table.tt{border-collapse:collapse;font-variant-numeric:tabular-nums;min-width:100%}
+table.tt th,table.tt td{border:1px solid var(--line);padding:6px 10px;text-align:center}
+table.tt th{background:var(--gum-soft);font-weight:800}
+.tablewrap{overflow-x:auto}
+
+/* practice */
+.practice{background:var(--card);border:2px solid var(--gum);border-radius:var(--r);padding:20px;display:flex;flex-direction:column;gap:16px;min-width:0}
+.ph{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.dots{display:flex;gap:6px}
+.dots i{width:12px;height:12px;border-radius:50%;background:var(--line);display:block}
+.dots i.ok{background:var(--gum)}
+.dots i.no{background:var(--coral)}
+.dots i.now{outline:2px solid var(--ink);outline-offset:2px}
+.qtext{font-size:20px;font-weight:700;max-width:60ch}
+.qvis{display:flex;justify-content:center;overflow-x:auto}
+.qvis svg{max-width:100%;height:auto}
+.answer{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.answer input{font:inherit;font-size:22px;font-weight:800;width:150px;padding:10px 12px;border:2px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);font-variant-numeric:tabular-nums}
+.answer .unitlab{font-weight:800;font-size:20px}
+.choices{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
+.choice{border:2px solid var(--line);background:var(--bg);border-radius:12px;padding:12px;font-weight:800;font-size:18px;display:flex;justify-content:center;align-items:center;gap:6px;min-height:56px}
+.choice:hover{border-color:var(--gum)}
+.choice.sel{border-color:var(--sky);background:var(--sky-soft)}
+.choice.right{border-color:var(--gum);background:var(--gum-soft)}
+.choice.wrong{border-color:var(--coral);background:var(--coral-soft)}
+.choice svg{max-width:100%;height:auto}
+.btn{border:0;border-radius:999px;padding:12px 22px;font-weight:800;background:var(--gum);color:var(--card)}
+.btn:disabled{opacity:.45;cursor:default}
+.btn.ghost{background:transparent;color:var(--ink);border:2px solid var(--line)}
+.btn.small{padding:6px 12px;font-size:14px}
+.feedback{border-radius:12px;padding:12px 16px;display:flex;flex-direction:column;gap:4px}
+.feedback.ok{background:var(--gum-soft)}
+.feedback.no{background:var(--coral-soft)}
+.feedback strong{font-family:var(--f-display);font-size:19px;font-weight:600}
+.actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.result{display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center;padding:10px 0}
+.result .big-stars{display:flex;gap:6px}
+.result .big-stars svg{width:46px;height:46px}
+.frac{display:inline-flex;flex-direction:column;align-items:center;line-height:1;font-variant-numeric:tabular-nums;vertical-align:middle}
+.frac span:first-child{border-bottom:2px solid currentColor;padding:0 3px 2px}
+.frac span:last-child{padding-top:2px}
+
+/* parent corner */
+.checklist{display:flex;flex-direction:column;gap:8px}
+.checklist label{display:flex;gap:10px;align-items:flex-start;cursor:pointer}
+.checklist input{width:20px;height:20px;margin-top:3px;accent-color:var(--gum);flex:none}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.grid3 > div{min-width:0}
+.grid3 ul{margin:4px 0 0;padding-left:20px;font-size:15px}
+
+/* svg text */
+svg text{font-family:var(--f-body);fill:var(--ink)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+@media (max-width:520px){.qtext{font-size:18px}.practice,.panel{padding:16px}}
+</style>
+
+<div class="wrap" id="app">
+  <header>
+    <div class="hello">
+      <span class="eyebrow">Victorian Curriculum · Term 4 home learning</span>
+      <h1>Asmi's Maths Term 4</h1>
+    </div>
+    <div class="stars" title="Stars earned in practice rounds">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4l-5.9 3.1 1.2-6.5L2.5 9.4l6.6-.9z" style="fill:var(--wattle)"/></svg>
+      <span id="starCount">0</span>&nbsp;stars
+    </div>
+  </header>
+
+  <div class="toolbar">
+    <div class="switch" role="group" aria-label="Choose level">
+      <button id="lvY2" aria-pressed="true">Year 2 · now</button>
+      <button id="lvY3" aria-pressed="false">Year 3 · next</button>
+    </div>
+    <div class="tabs" role="tablist">
+      <button role="tab" id="tabLearn" aria-selected="true">Lessons</button>
+      <button role="tab" id="tabParent" aria-selected="false">Parent corner</button>
+    </div>
+  </div>
+
+  <main id="view"></main>
+</div>
+
+<script>
+/* ---------- helpers ---------- */
+const R=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+const P=a=>a[Math.floor(Math.random()*a.length)];
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+function opts(ans,distract,n=4){ans=String(ans);const d=[...new Set(distract.map(String))].filter(x=>x!==ans);return shuffle([ans,...shuffle(d).slice(0,n-1)])}
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const DAYS=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+const MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
+const MDAYS=[31,28,31,30,31,30,31,31,30,31,30,31];
+const SEASON=m=>[0,1,11].includes(m)?'Summer':m<=4?'Autumn':m<=7?'Winter':'Spring';
+const ord=n=>n+(n%100>=11&&n%100<=13?'th':({1:'st',2:'nd',3:'rd'}[n%10]||'th'));
+const fmt=(h,m)=>`${h}:${String(m).padStart(2,'0')}`;
+const nextH=h=>h%12+1, prevH=h=>(h+10)%12+1;
+function words(h,m){
+  if(m===0)return `${h} o'clock`; if(m===15)return `quarter past ${h}`; if(m===30)return `half past ${h}`; if(m===45)return `quarter to ${nextH(h)}`;
+  if(m<30)return `${m} minute${m===1?'':'s'} past ${h}`; const t=60-m; return `${t} minute${t===1?'':'s'} to ${nextH(h)}`;
+}
+function addMin(h,m,d){let t=(h%12)*60+m+d; t=((t%720)+720)%720; let H=Math.floor(t/60),M=t%60; return [H===0?12:H,M]}
+const STAR='M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4l-5.9 3.1 1.2-6.5L2.5 9.4l6.6-.9z';
+const starsSVG=(n,max=3)=>Array.from({length:max},(_,i)=>`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="${STAR}" style="fill:${i<n?'var(--wattle)':'var(--line)'}"/></svg>`).join('');
+const fracHTML=(a,b)=>`<span class="frac"><span>${a}</span><span>${b}</span></span>`;
+
+/* ---------- diagrams (SVG) ---------- */
+function clock(h,m,size=200){
+  const pt=(deg,r)=>[100+r*Math.sin(deg*Math.PI/180),100-r*Math.cos(deg*Math.PI/180)];
+  let s=`<svg viewBox="0 0 200 200" width="${size}" height="${size}" role="img" aria-label="analogue clock"><circle cx="100" cy="100" r="94" style="fill:var(--card);stroke:var(--ink);stroke-width:5"/>`;
+  for(let i=0;i<60;i++){const big=i%5===0;const [x1,y1]=pt(i*6,big?78:84),[x2,y2]=pt(i*6,89);s+=`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" style="stroke:var(--ink);stroke-width:${big?3:1.2}"/>`}
+  for(let n=1;n<=12;n++){const [x,y]=pt(n*30,64);s+=`<text x="${x}" y="${y+7}" text-anchor="middle" font-size="20" font-weight="800">${n}</text>`}
+  const [hx,hy]=pt((h%12)*30+m*.5,46),[mx,my]=pt(m*6,74);
+  s+=`<line x1="100" y1="100" x2="${hx}" y2="${hy}" style="stroke:var(--ink);stroke-width:8;stroke-linecap:round"/>`;
+  s+=`<line x1="100" y1="100" x2="${mx}" y2="${my}" style="stroke:var(--coral);stroke-width:4.5;stroke-linecap:round"/>`;
+  return s+`<circle cx="100" cy="100" r="6" style="fill:var(--ink)"/></svg>`;
+}
+function calendar(y,mo,marks={}){
+  const first=(new Date(y,mo,1).getDay()+6)%7, n=(mo===1&&y%4===0)?29:MDAYS[mo];
+  const rows=Math.ceil((first+n)/7), cw=46, ch=36, W=cw*7+8, H=60+rows*ch+6;
+  let s=`<svg viewBox="0 0 ${W} ${H}" width="${W}" role="img" aria-label="calendar for ${MONTHS[mo]} ${y}"><rect x="1" y="1" width="${W-2}" height="${H-2}" rx="10" style="fill:var(--card);stroke:var(--line);stroke-width:2"/>`;
+  s+=`<text x="${W/2}" y="26" text-anchor="middle" font-size="17" font-weight="800">${MONTHS[mo]} ${y}</text>`;
+  ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].forEach((d,i)=>s+=`<text x="${4+i*cw+cw/2}" y="50" text-anchor="middle" font-size="12" font-weight="800" style="fill:${i>4?'var(--coral)':'var(--muted)'}">${d}</text>`);
+  for(let d=1;d<=n;d++){const c=(first+d-1)%7,r=Math.floor((first+d-1)/7),x=4+c*cw,yy=58+r*ch;
+    const mk=marks[d];
+    s+=`<rect x="${x+2}" y="${yy}" width="${cw-4}" height="${ch-4}" rx="6" style="fill:${mk?'var(--wattle-soft)':'var(--bg)'};stroke:${mk?'var(--wattle)':'none'};stroke-width:2"/>`;
+    s+=`<text x="${x+cw/2}" y="${yy+(mk?15:21)}" text-anchor="middle" font-size="${mk?12:14}" font-weight="700">${d}</text>`;
+    if(mk)s+=`<text x="${x+cw/2}" y="${yy+28}" text-anchor="middle" font-size="9" font-weight="800" style="fill:var(--wattle-ink)">${esc(mk)}</text>`;
+  }
+  return s+'</svg>';
+}
+function tally(n,scale=1){
+  const groups=Math.floor(n/5),rest=n%5;let x=8,s='';
+  for(let g=0;g<groups;g++){for(let i=0;i<4;i++)s+=`<line x1="${x+i*9}" y1="8" x2="${x+i*9}" y2="44" style="stroke:var(--ink);stroke-width:3;stroke-linecap:round"/>`;s+=`<line x1="${x-5}" y1="38" x2="${x+32}" y2="14" style="stroke:var(--coral);stroke-width:3;stroke-linecap:round"/>`;x+=52}
+  for(let i=0;i<rest;i++)s+=`<line x1="${x+i*9}" y1="8" x2="${x+i*9}" y2="44" style="stroke:var(--ink);stroke-width:3;stroke-linecap:round"/>`;
+  const W=Math.max(x+rest*9+10,40);
+  return `<svg viewBox="0 0 ${W} 52" width="${W*scale}" role="img" aria-label="tally marks">${s}</svg>`;
+}
+function tallyChart(rows){
+  let s='', W=380, H=24+rows.length*54;
+  s+=`<svg viewBox="0 0 ${W} ${H}" width="${W}" role="img" aria-label="tally chart"><rect x="1" y="1" width="${W-2}" height="${H-2}" rx="10" style="fill:var(--card);stroke:var(--line);stroke-width:2"/>`;
+  rows.forEach((r,i)=>{const y=14+i*54;s+=`<text x="16" y="${y+30}" font-size="16" font-weight="800">${esc(r.label)}</text><g transform="translate(130 ${y})">${tally(r.n).replace(/^<svg[^>]*>/,'').replace(/<\/svg>$/,'')}</g>`;if(i)s+=`<line x1="10" y1="${y-4}" x2="${W-10}" y2="${y-4}" style="stroke:var(--line)"/>`});
+  return s+'</svg>';
+}
+function picGraph(rows,per,unit='children'){
+  const r=12,gap=28,lw=100,maxSym=Math.max(...rows.map(o=>Math.ceil(o.n/per)));
+  const W=lw+maxSym*gap+24, H=rows.length*38+56;
+  let s=`<svg viewBox="0 0 ${W} ${H}" width="${W}" role="img" aria-label="picture graph"><rect x="1" y="1" width="${W-2}" height="${H-2}" rx="10" style="fill:var(--card);stroke:var(--line);stroke-width:2"/>`;
+  rows.forEach((o,i)=>{const y=26+i*38;s+=`<text x="14" y="${y+6}" font-size="15" font-weight="800">${esc(o.label)}</text>`;
+    const full=Math.floor(o.n/per),half=o.n%per;
+    for(let k=0;k<full;k++)s+=`<circle cx="${lw+k*gap+r}" cy="${y}" r="${r}" style="fill:var(--c${(i%5)+1})"/>`;
+    if(half){const cx=lw+full*gap+r;s+=`<path d="M${cx} ${y-r} A${r} ${r} 0 0 0 ${cx} ${y+r} Z" style="fill:var(--c${(i%5)+1})"/>`}
+  });
+  const ky=H-18;
+  s+=`<line x1="10" y1="${ky-20}" x2="${W-10}" y2="${ky-20}" style="stroke:var(--line)"/><text x="14" y="${ky+4}" font-size="14" font-weight="700">Key:</text><circle cx="62" cy="${ky}" r="9" style="fill:var(--muted)"/><text x="78" y="${ky+5}" font-size="14" font-weight="700">= ${per} ${per===1?unit.replace(/ren$/,'').replace(/s$/,''):unit}</text>`;
+  return s+'</svg>';
+}
+function colGraph(labels,vals,step,max,title='',yLabel='Number of children'){
+  const W=400,H=270,L=52,B=50,T=title?34:14,Rm=10, ph=H-B-T, pw=W-L-Rm, slot=pw/labels.length;
+  const y=v=>H-B-v/max*ph;
+  let s=`<svg viewBox="0 0 ${W} ${H}" width="${W}" role="img" aria-label="column graph">`;
+  if(title)s+=`<text x="${W/2}" y="20" text-anchor="middle" font-size="15" font-weight="800">${esc(title)}</text>`;
+  for(let v=0;v<=max;v+=step){s+=`<line x1="${L}" y1="${y(v)}" x2="${W-Rm}" y2="${y(v)}" style="stroke:var(--line);stroke-width:1.2"/><text x="${L-8}" y="${y(v)+5}" text-anchor="end" font-size="13" font-weight="700" style="fill:var(--muted)">${v}</text>`}
+  if(step>1&&step%2===0) for(let v=step/2;v<max;v+=step) s+=`<line x1="${L}" y1="${y(v)}" x2="${W-Rm}" y2="${y(v)}" style="stroke:var(--line);stroke-width:.6;stroke-dasharray:3 4"/>`;
+  labels.forEach((lb,i)=>{const bw=slot*.58,x=L+i*slot+(slot-bw)/2;s+=`<rect x="${x}" y="${y(vals[i])}" width="${bw}" height="${H-B-y(vals[i])}" rx="3" style="fill:var(--c${(i%5)+1})"/><text x="${x+bw/2}" y="${H-B+20}" text-anchor="middle" font-size="13" font-weight="800">${esc(lb)}</text>`});
+  s+=`<line x1="${L}" y1="${T-4}" x2="${L}" y2="${H-B}" style="stroke:var(--ink);stroke-width:2"/><line x1="${L}" y1="${H-B}" x2="${W-Rm}" y2="${H-B}" style="stroke:var(--ink);stroke-width:2"/>`;
+  s+=`<text transform="translate(14 ${T+ph/2}) rotate(-90)" text-anchor="middle" font-size="12" font-weight="700" style="fill:var(--muted)">${esc(yLabel)}</text>`;
+  return s+'</svg>';
+}
+function jug(level,max=1000,labelStep=100,minor=50,showLabels=true,size=220){
+  const top=30,bot=280,h=bot-top, y=v=>bot-v/max*h;
+  let s=`<svg viewBox="0 0 230 300" width="${size}" role="img" aria-label="measuring jug">`;
+  s+=`<path d="M30 70 Q6 74 8 130 Q10 190 50 200" style="fill:none;stroke:var(--muted);stroke-width:9;stroke-linecap:round"/>`;
+  if(level>0)s+=`<rect x="52" y="${y(level)}" width="116" height="${bot-y(level)}" style="fill:var(--water);opacity:.85"/>`;
+  s+=`<path d="M48 ${top-14} L48 ${bot} Q48 ${bot+8} 56 ${bot+8} L164 ${bot+8} Q172 ${bot+8} 172 ${bot} L172 ${top-14}" style="fill:none;stroke:var(--ink);stroke-width:4"/>`;
+  if(showLabels){for(let v=minor;v<=max;v+=minor){const major=v%labelStep===0;s+=`<line x1="172" y1="${y(v)}" x2="${major?148:158}" y2="${y(v)}" style="stroke:var(--ink);stroke-width:${major?2.5:1.5}"/>`;if(major)s+=`<text x="180" y="${y(v)+5}" font-size="13" font-weight="800">${v}</text>`}
+    s+=`<text x="180" y="${top-16}" font-size="13" font-weight="800" style="fill:var(--muted)">mL</text>`}
+  return s+'</svg>';
+}
+function dial(g,size=230){
+  const cx=120,cy=140,pt=(deg,r)=>[cx+r*Math.sin(deg*Math.PI/180),cy-r*Math.cos(deg*Math.PI/180)];
+  let s=`<svg viewBox="0 0 240 270" width="${size}" role="img" aria-label="kitchen scale dial"><rect x="40" y="8" width="160" height="16" rx="8" style="fill:var(--muted)"/><rect x="112" y="22" width="16" height="16" style="fill:var(--muted)"/>`;
+  s+=`<circle cx="${cx}" cy="${cy}" r="102" style="fill:var(--card);stroke:var(--ink);stroke-width:5"/>`;
+  for(let v=0;v<1000;v+=50){const big=v%100===0;const [x1,y1]=pt(v*.36,big?80:88),[x2,y2]=pt(v*.36,96);s+=`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" style="stroke:var(--ink);stroke-width:${big?3:1.5}"/>`;
+    if(big){const [tx,ty]=pt(v*.36,64);s+=`<text x="${tx}" y="${ty+5}" text-anchor="middle" font-size="13" font-weight="800">${v}</text>`}}
+  s+=`<text x="${cx}" y="${cy+42}" text-anchor="middle" font-size="13" font-weight="800" style="fill:var(--muted)">grams</text>`;
+  const [px,py]=pt(g*.36,84);
+  s+=`<line x1="${cx}" y1="${cy}" x2="${px}" y2="${py}" style="stroke:var(--coral);stroke-width:4;stroke-linecap:round"/><circle cx="${cx}" cy="${cy}" r="7" style="fill:var(--coral)"/>`;
+  return s+'</svg>';
+}
+function cupIcon(x,y){return `<path d="M${x} ${y} L${x+16} ${y} L${x+13} ${y+20} L${x+3} ${y+20} Z" style="fill:var(--water);stroke:var(--sky);stroke-width:1.5"/>`}
+function cupRows(items){
+  const W=420,H=items.length*44+14;let s=`<svg viewBox="0 0 ${W} ${H}" width="${W}" role="img" aria-label="cups needed to fill each container">`;
+  items.forEach((it,i)=>{const y=12+i*44;s+=`<text x="8" y="${y+18}" font-size="15" font-weight="800">${esc(it.name)}</text>`;for(let k=0;k<it.cups;k++)s+=cupIcon(120+k*24,y+2)});
+  return s+'</svg>';
+}
+function balance(left,right,tilt){ /* left/right: {label} or {cubes:n}; tilt: -1 left down, 0 level, 1 right down */
+  const th=tilt*10*Math.PI/180, c=Math.cos(th), sn=Math.sin(th);
+  const lx=150-100*c, ly=72-100*sn, rx=150+100*c, ry=72+100*sn;
+  let s=`<svg viewBox="0 0 300 210" width="300" role="img" aria-label="balance scale"><path d="M150 72 L125 196 L175 196 Z" style="fill:var(--muted)"/><rect x="100" y="194" width="100" height="8" rx="4" style="fill:var(--muted)"/>`;
+  s+=`<line x1="${lx}" y1="${ly}" x2="${rx}" y2="${ry}" style="stroke:var(--ink);stroke-width:6;stroke-linecap:round"/><circle cx="150" cy="72" r="6" style="fill:var(--ink)"/>`;
+  const pan=(x,y,o)=>{let p=`<line x1="${x}" y1="${y}" x2="${x-32}" y2="${y+50}" style="stroke:var(--muted);stroke-width:1.5"/><line x1="${x}" y1="${y}" x2="${x+32}" y2="${y+50}" style="stroke:var(--muted);stroke-width:1.5"/><path d="M${x-40} ${y+50} Q${x} ${y+68} ${x+40} ${y+50} Z" style="fill:var(--line);stroke:var(--ink);stroke-width:2"/>`;
+    if(o.cubes){for(let k=0;k<o.cubes;k++){const col=k%5,row=Math.floor(k/5);p+=`<rect x="${x-26+col*11}" y="${y+38-row*11}" width="10" height="10" rx="1.5" style="fill:var(--cube);stroke:var(--ink);stroke-width:.8"/>`}}
+    else p+=`<text x="${x}" y="${y+44}" text-anchor="middle" font-size="15" font-weight="800">${esc(o.label)}</text>`;
+    return p};
+  return s+pan(lx,ly,left)+pan(rx,ry,right)+'</svg>';
+}
+function numberLineTime(){ /* 3:45 -> 5:10 */
+  return `<svg viewBox="0 0 440 120" width="440" role="img" aria-label="number line from 3:45 to 5:10">
+  <line x1="20" y1="80" x2="420" y2="80" style="stroke:var(--ink);stroke-width:3"/>
+  ${[[30,'3:45'],[110,'4:00'],[330,'5:00'],[400,'5:10']].map(([x,t])=>`<line x1="${x}" y1="72" x2="${x}" y2="88" style="stroke:var(--ink);stroke-width:3"/><text x="${x}" y="108" text-anchor="middle" font-size="14" font-weight="800">${t}</text>`).join('')}
+  <path d="M30 72 Q70 30 110 72" style="fill:none;stroke:var(--coral);stroke-width:3"/><text x="70" y="40" text-anchor="middle" font-size="14" font-weight="800" style="fill:var(--coral)">+15 min</text>
+  <path d="M110 72 Q220 0 330 72" style="fill:none;stroke:var(--gum);stroke-width:3"/><text x="220" y="26" text-anchor="middle" font-size="14" font-weight="800" style="fill:var(--gum)">+1 hour</text>
+  <path d="M330 72 Q365 40 400 72" style="fill:none;stroke:var(--sky);stroke-width:3"/><text x="365" y="44" text-anchor="middle" font-size="14" font-weight="800" style="fill:var(--sky)">+10</text></svg>`;
+}
+function knuckles(){
+  const ms=['Jan','Feb','Mar','Apr','May','Jun','Jul'];let s=`<svg viewBox="0 0 440 150" width="440" role="img" aria-label="knuckle trick for days in each month">`;
+  s+=`<path d="M20 120 Q20 60 60 56 L380 56 Q420 60 420 120 Z" style="fill:var(--wattle-soft);stroke:var(--wattle);stroke-width:2"/>`;
+  ms.forEach((m,i)=>{const x=50+i*56,knuckle=i%2===0;s+=knuckle?`<circle cx="${x}" cy="56" r="18" style="fill:var(--wattle);"/>`:`<circle cx="${x}" cy="70" r="6" style="fill:var(--muted)"/>`;
+    s+=`<text x="${x}" y="${knuckle?30:96}" text-anchor="middle" font-size="14" font-weight="800">${m}</text><text x="${x}" y="${knuckle?62:116}" text-anchor="middle" font-size="12" font-weight="800" style="fill:${knuckle?'var(--ink)':'var(--muted)'}">${knuckle?31:(m==='Feb'?'28':30)}</text>`});
+  return s+`<text x="220" y="144" text-anchor="middle" font-size="12" style="fill:var(--muted)">Knuckle = 31 days. Dip = 30 (Feb 28). Start again on the first knuckle for August.</text></svg>`;
+}
+
+/* ---------- question engine ---------- */
+/* each generator returns {q, vis, type:'num'|'choice', ans, ch, chHTML, pre, suf, why} */
+
+const Y2 = {
+  id:'y2', name:'Year 2', tag:'now',
+  intro:'Finish Year 2 strong. These are the same three topics as Asmi\'s Year 2 Term 4 kit: telling the time and using a calendar, comparing how much things hold and how heavy they are, and collecting data with tallies and graphs.',
+  units:[
+  {title:'Time and Calendar', strand:'Measurement · time', lessons:[
+    {id:'y2-days', title:'Days, weeks and fortnights', d:'Order the days, use a calendar, count in weeks.',
+     say:'“There are 7 days in a week. Monday to Friday are school days, and Saturday and Sunday are the weekend. Two weeks together are called a fortnight, so a fortnight is 14 days. On a calendar, each row is one week. If you go straight down one row, you land on the same day one week later, which is 7 days on.”',
+     diagram:()=>calendar(2026,11,{4:'Swim',11:'Swim',25:'Xmas'}), caption:'December 2026. Swimming is every Friday: 4th, 11th… each one is 7 days after the last.',
+     examples:[{q:'Swimming is on Friday 4 December. When is the next swimming lesson?',a:'Go straight down one row on the calendar: Friday 11 December. 4 + 7 = 11.'},
+               {q:'How many days are in a fortnight?',a:'A fortnight is 2 weeks. 7 + 7 = 14 days.'}],
+     turn:'Find your birthday month on a calendar. What day of the week is your birthday this year?',
+     gen(){const t=R(0,3);
+       if(t===0){const i=R(0,6),k=R(1,2),after=Math.random()<.6,j=((i+(after?k:-k))%7+7)%7;
+         return {q:`What day is ${k===1?'one day':'2 days'} ${after?'after':'before'} ${DAYS[i]}?`,type:'choice',ans:DAYS[j],ch:opts(DAYS[j],DAYS),why:`Say the days in order: ${after?'forwards':'backwards'} ${k} from ${DAYS[i]} lands on ${DAYS[j]}.`}}
+       if(t===1){const f=P([['How many days are in one week?',7,'Monday to Sunday is 7 days.'],['How many days are in a fortnight?',14,'A fortnight is 2 weeks: 7 + 7 = 14.'],['How many school days are in one week?',5,'Monday, Tuesday, Wednesday, Thursday, Friday.'],['How many weeks are in a fortnight?',2,'Fortnight means two weeks.'],['How many days are in 3 weeks?',21,'7 + 7 + 7 = 21.'],['How many days are in the weekend?',2,'Saturday and Sunday.']]);
+         return {q:f[0],type:'num',ans:f[1],suf:'',why:f[2]}}
+       const y=P([2026,2027]),mo=R(0,11),n=MDAYS[mo];
+       if(t===2){const d=R(1,n),wd=DAYS[(new Date(y,mo,d).getDay()+6)%7];
+         return {q:`Look at the calendar. What day of the week is the ${ord(d)}?`,vis:calendar(y,mo),type:'choice',ans:wd,ch:opts(wd,DAYS),why:`Find ${d} on the calendar and look up to the top of its column: ${wd}.`}}
+       const d=R(1,n-7);return {q:`What is the date one week after the ${ord(d)}?`,vis:calendar(y,mo,{[d]:'start'}),type:'num',ans:d+7,why:`One week is 7 days. Go straight down one row: ${d} + 7 = ${d+7}.`}}},
+    {id:'y2-months', title:'Months and the knuckle trick', d:'Months in order, days in each month, Australian seasons.',
+     say:'“There are 12 months in a year, starting with January. Make two fists and put them together. Each knuckle is a month with 31 days, and each dip between knuckles has 30 days. February is the special one, with 28 days (29 in a leap year). In Australia, summer is December, January and February.”',
+     diagram:knuckles, caption:'The knuckle trick for January to July. Keep going on the first knuckle again: August has 31 days.',
+     facts:['30 days: September, April, June and November','31 days: all the rest, except February','February: 28 days (29 in a leap year)','Seasons: Summer Dec–Feb · Autumn Mar–May · Winter Jun–Aug · Spring Sep–Nov'],
+     examples:[{q:'What month comes after October?',a:'November. October is month 10, November is month 11.'},
+               {q:'How many days does April have?',a:'April is on a dip, so it has 30 days.'}],
+     turn:'Say all 12 months in order without looking. Then use your knuckles to find how many days are in your birthday month.',
+     gen(){const t=R(0,3),i=R(0,11);
+       if(t===0){const after=Math.random()<.6,j=(i+(after?1:11))%12;return {q:`What month comes ${after?'after':'before'} ${MONTHS[i]}?`,type:'choice',ans:MONTHS[j],ch:opts(MONTHS[j],[MONTHS[(i+2)%12],MONTHS[(i+10)%12],MONTHS[(i+(after?11:1))%12],MONTHS[(i+3)%12]]),why:`${MONTHS[i]} is month ${i+1}. ${after?'The next':'The one before'} is ${MONTHS[j]}.`}}
+       if(t===1){return {q:`How many days are in ${MONTHS[i]}${i===1?' 2027':''}?`,type:'choice',ans:String(MDAYS[i]),ch:['28','30','31'],why:i===1?'February has 28 days (29 only in a leap year, and 2027 is not one).':MDAYS[i]===31?`${MONTHS[i]} is on a knuckle: 31 days.`:`${MONTHS[i]} is on a dip: 30 days.`}}
+       if(t===2){return {q:`What number month is ${MONTHS[i]}?`,type:'num',ans:i+1,why:`Count from January (1): ${MONTHS[i]} is month ${i+1}.`}}
+       return {q:`In Australia, which season is ${MONTHS[i]} in?`,type:'choice',ans:SEASON(i),ch:['Summer','Autumn','Winter','Spring'],why:'Summer Dec–Feb, Autumn Mar–May, Winter Jun–Aug, Spring Sep–Nov.'}}},
+    {id:'y2-clock', title:'O\'clock, half past and quarters', d:'Read analogue clocks to the quarter hour.',
+     say:'“The short hand points to the hour. The long hand shows the minutes. When the long hand points straight up to 12, it is o\'clock. When it points down to 6, it has gone half way round: half past. On the 3 it is quarter past, and on the 9 it is quarter to the next hour.”',
+     diagram:()=>`<div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center">${clock(3,0,130)}${clock(3,15,130)}${clock(3,30,130)}${clock(3,45,130)}</div>`, caption:'3 o\'clock · quarter past 3 · half past 3 · quarter to 4',
+     examples:[{q:'The long hand is on 6 and the short hand is between 7 and 8. What time is it?',a:'Long hand on 6 means half past. The short hand has passed 7, so it is half past 7, or 7:30.'},
+               {q:'The long hand is on 9 and the short hand is nearly on 5. What time is it?',a:'Long hand on 9 is quarter to. The short hand is nearly at 5, so it is quarter to 5, or 4:45.'}],
+     turn:'Make a paper plate clock. Ask a grown-up to call out a time and set the hands.',
+     gen(){const t=R(0,3),h=R(1,12),m=P([0,15,30,45]);
+       if(t===0){const ans=words(h,m);return {q:'What time does the clock show?',vis:clock(h,m),type:'choice',ans,ch:opts(ans,[words(h,(m+15)%60),words(h,(m+30)%60),words(nextH(h),m),words(prevH(h),m)]),why:`The long hand is on ${m===0?12:m/5}, so it is ${m===0?"o'clock":m===30?'half past':m===15?'quarter past':'quarter to'}. Look at the short hand for the hour.`}}
+       if(t===1){const ans=fmt(h,m);return {q:'Which digital time matches the clock?',vis:clock(h,m),type:'choice',ans,ch:opts(ans,[fmt(h,(m+15)%60),fmt(h,(m+30)%60),fmt(nextH(h),m),fmt(h,(m+45)%60)]),why:`It is ${words(h,m)}, which is ${ans}.`}}
+       if(t===2){const set=[[h,m],[h,(m+30)%60],[nextH(h),m],[h,(m+15)%60]];const keys=set.map(([a,b])=>fmt(a,b));const html={};set.forEach(([a,b],i)=>html[keys[i]]=clock(a,b,110));
+         return {q:`Which clock shows ${words(h,m)}?`,type:'choice',ans:keys[0],ch:shuffle([...new Set(keys)]),chHTML:html,why:`${words(h,m)}: long hand on ${m===0?12:m/5}.`}}
+       const d=P([60,30]),hh=R(1,11),mm=P([0,30]);const [H,M]=addMin(hh,mm,d);const ans=fmt(H,M);
+       return {q:`It is ${words(hh,mm)}. What time will it be ${d===60?'one hour':'half an hour'} later?`,vis:clock(hh,mm,170),type:'choice',ans,ch:opts(ans,[fmt(hh,mm),fmt(...addMin(hh,mm,d===60?30:60)),fmt(...addMin(hh,mm,90)),fmt(...addMin(hh,mm,-30))]),why:d===60?'One hour later the long hand comes back to the same place and the hour goes up by 1.':'Half an hour is 30 minutes: the long hand moves half way round.'}}}
+  ]},
+  {title:'Capacity and Mass', strand:'Measurement · capacity and mass', lessons:[
+    {id:'y2-capacity', title:'Which holds more?', d:'Compare containers by counting cups.',
+     say:'“Capacity means how much a container can hold. We can find out by filling it with the same cup again and again and counting. The container that needs more cups holds more. Full means right to the top, half full means half way, and empty means nothing inside.”',
+     diagram:()=>cupRows([{name:'Saucepan',cups:8},{name:'Teapot',cups:5},{name:'Mug',cups:2}]), caption:'The saucepan holds the most: 8 cups. The mug holds the least: 2 cups.',
+     examples:[{q:'The saucepan holds 8 cups and the teapot holds 5 cups. How many more cups does the saucepan hold?',a:'8 − 5 = 3. The saucepan holds 3 more cups.'},
+               {q:'How many cups would fill the teapot and the mug?',a:'5 + 2 = 7 cups.'}],
+     turn:'Choose 3 containers in the kitchen. Guess which holds the most. Fill each one with the same cup and count. Were you right?',
+     gen(){const t=R(0,3);const names=shuffle(['Bucket','Jug','Bottle','Bowl','Vase','Saucepan','Mug','Watering can']);
+       if(t<=2){const a=R(3,11);let b=R(1,10);while(b===a)b=R(1,10);let c=R(1,9);while(c===a||c===b)c=R(1,9);
+         const items=[{name:names[0],cups:a},{name:names[1],cups:b},{name:names[2],cups:c}];
+         if(t===0){const most=Math.random()<.6,best=items.slice().sort((x,y)=>most?y.cups-x.cups:x.cups-y.cups)[0];return {q:`Which container holds the ${most?'most':'least'}?`,vis:cupRows(items),type:'choice',ans:best.name,ch:shuffle(items.map(i=>i.name)),why:`The ${best.name.toLowerCase()} needs ${best.cups} cups, the ${most?'most':'fewest'} of the three.`}}
+         if(t===1){const [x,y]=a>b?[items[0],items[1]]:[items[1],items[0]];return {q:`How many more cups does the ${x.name.toLowerCase()} hold than the ${y.name.toLowerCase()}?`,vis:cupRows(items.slice(0,2)),type:'num',ans:x.cups-y.cups,suf:'cups',why:`${x.cups} − ${y.cups} = ${x.cups-y.cups}.`}}
+         return {q:`How many cups would fill the ${items[0].name.toLowerCase()} and the ${items[1].name.toLowerCase()} together?`,vis:cupRows(items.slice(0,2)),type:'num',ans:a+b,suf:'cups',why:`${a} + ${b} = ${a+b}.`}}
+       const lv=P([[0,'empty'],[500,'half full'],[1000,'full']]);return {q:'Is the jug full, half full or empty?',vis:jug(lv[0],1000,100,50,false,160),type:'choice',ans:lv[1],ch:['full','half full','empty'],why:lv[1]==='half full'?'The water comes half way up the jug.':lv[1]==='full'?'The water reaches the top.':'There is no water in the jug.'}}},
+    {id:'y2-mass', title:'Heavier and lighter', d:'Use a balance and cubes to compare mass.',
+     say:'“Mass tells us how heavy something is. On a balance scale, the heavier side goes down and the lighter side goes up. If both sides are level, they have the same mass. We can put cubes on one side to measure: if an apple balances 6 cubes, its mass is 6 cubes.”',
+     diagram:()=>`<div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center">${balance({label:'Book'},{label:'Pencil'},-1)}${balance({label:'Apple'},{cubes:6},0)}</div>`, caption:'Left: the book is heavier, so its side goes down. Right: the apple balances 6 cubes.',
+     examples:[{q:'An orange balances 9 cubes. An apple balances 6 cubes. Which is heavier, and by how many cubes?',a:'The orange: 9 − 6 = 3 cubes heavier.'},
+               {q:'The balance is level with a toy car on one side and 4 cubes on the other. What is the mass of the car?',a:'Level means the same mass, so the car is 4 cubes.'}],
+     turn:'Make a coat-hanger balance with two bags. Find something lighter than your shoe and something heavier.',
+     gen(){const t=R(0,3);const objs=shuffle(['apple','banana','orange','lemon','toy car','glue stick','potato','teddy','pencil case','mug']);
+       if(t===0){const tilt=P([-1,1]);const L=objs[0],Rt=objs[1];const heavy=tilt<0?L:Rt;return {q:'Look at the balance. Which is heavier?',vis:balance({label:L},{label:Rt},tilt),type:'choice',ans:heavy,ch:[L,Rt],why:`The ${heavy} side has gone down, so the ${heavy} is heavier.`}}
+       if(t===1){const n=R(3,14);return {q:`The balance is level. What is the mass of the ${objs[0]} in cubes?`,vis:balance({label:objs[0]},{cubes:n},0),type:'num',ans:n,suf:'cubes',why:`Count the cubes: ${n}. Level means the same mass.`}}
+       if(t===2){const a=R(4,15),b=R(2,a-1);return {q:`The ${objs[0]} balances ${a} cubes. The ${objs[1]} balances ${b} cubes. How many cubes heavier is the ${objs[0]}?`,type:'num',ans:a-b,suf:'cubes',why:`${a} − ${b} = ${a-b}.`}}
+       const vals=shuffle([R(2,5),R(6,9),R(10,14)]);const it=objs.slice(0,3).map((o,i)=>({o,v:vals[i]}));const light=Math.random()<.5;const best=it.slice().sort((x,y)=>light?x.v-y.v:y.v-x.v)[0];
+       return {q:`${it.map(x=>`The ${x.o} balances ${x.v} cubes.`).join(' ')} Which is the ${light?'lightest':'heaviest'}?`,type:'choice',ans:best.o,ch:shuffle(it.map(x=>x.o)),why:`The ${best.o} needs the ${light?'fewest':'most'} cubes (${best.v}).`}}},
+    {id:'y2-fair', title:'Measuring fairly', d:'Same-size units, doubling and halving.',
+     say:'“When we measure, we must use the same unit every time. If Asmi fills a bucket with a big cup and Dad uses a small cup, they get different numbers even though it is the same bucket. A bigger cup needs fewer scoops. That is why grown-ups use standard units like litres and kilograms, which you will learn about in Year 3.”',
+     diagram:()=>cupRows([{name:'Big cup',cups:6},{name:'Small cup',cups:12}]), caption:'Same bucket, two different cups. The small cup needs twice as many scoops.',
+     examples:[{q:'A jug holds 4 cups. How many cups do 2 jugs hold?',a:'Double 4: 4 + 4 = 8 cups.'},
+               {q:'Mia filled a vase with 5 scoops of the red cup. Sam filled it with 10 scoops of the blue cup. Which cup is bigger?',a:'The red cup. A bigger cup needs fewer scoops.'}],
+     turn:'Fill the same bowl twice: once with a tablespoon, once with a cup. Why are the numbers so different?',
+     gen(){const t=R(0,3);
+       if(t===0){const a=R(3,8);return {q:`Asmi filled a bucket with ${a} scoops of a big cup. Dad filled the same bucket with ${a*2} scoops of a small cup. Why are the numbers different?`,type:'choice',ans:'The cups are different sizes',ch:shuffle(['The cups are different sizes','The bucket got bigger','Dad counted wrong','Asmi spilt water']),why:'Same bucket, different units. A smaller cup needs more scoops.'}}
+       if(t===1){const a=R(3,7),b=a+R(2,6);const c=shuffle([['red',a],['blue',b]]);const big=a<b?(c[0][1]===a?c[0][0]:c[1][0]):'';return {q:`Mia filled a vase with ${c[0][1]} scoops of the ${c[0][0]} cup. Sam filled the same vase with ${c[1][1]} scoops of the ${c[1][0]} cup. Which cup is bigger?`,type:'choice',ans:`the ${big} cup`,ch:shuffle(['the red cup','the blue cup']),why:`The ${big} cup needed fewer scoops (${a}), so each scoop holds more.`}}
+       if(t===2){const a=R(2,9),k=P([2,3]);return {q:`One jug holds ${a} cups. How many cups do ${k} jugs hold?`,type:'num',ans:a*k,suf:'cups',why:`${Array(k).fill(a).join(' + ')} = ${a*k}.`}}
+       const a=2*R(2,9);return {q:`A bag of rice balances ${a} cubes. Half the bag balances how many cubes?`,type:'num',ans:a/2,suf:'cubes',why:`Half of ${a} is ${a/2}, because ${a/2} + ${a/2} = ${a}.`}}}
+  ]},
+  {title:'Data Collection', strand:'Statistics', lessons:[
+    {id:'y2-tally', title:'Tally marks', d:'Count and record with tallies in groups of 5.',
+     say:'“Tally marks help us count quickly. We draw one line for each thing. The fifth line goes across the other four, like a gate. Then we count the gates by fives and add the extra lines: 5, 10, 11, 12.”',
+     diagram:()=>tally(12,1.6), caption:'Two gates and two more lines: 5, 10, 11, 12.',
+     examples:[{q:'How many is three gates and one line?',a:'Count by fives for the gates: 5, 10, 15. Then one more: 16.'},
+               {q:'How do you show 7 with tally marks?',a:'One gate (5) and two more lines.'}],
+     turn:'Stand at the window for 5 minutes. Make a tally of cars, bikes and people walking past.',
+     gen(){const t=R(0,3);
+       if(t===0){const n=R(3,23);return {q:'How many do these tally marks show?',vis:tally(n,1.5),type:'num',ans:n,why:`${Math.floor(n/5)} gate${Math.floor(n/5)===1?'':'s'} = ${Math.floor(n/5)*5}, plus ${n%5} more = ${n}.`}}
+       if(t===1){const n=R(4,18);return {q:'One more person joins. What is the new total?',vis:tally(n,1.5),type:'num',ans:n+1,why:`The tally shows ${n}. One more makes ${n+1}.`}}
+       if(t===2){const n=R(6,17);const set=[n,n+1,n-1,n+5].filter(v=>v>0);const keys=set.map(String);const html={};set.forEach(v=>html[String(v)]=tally(v,1));return {q:`Which tally shows ${n}?`,type:'choice',ans:String(n),ch:shuffle([...new Set(keys)]),chHTML:html,why:`${n} is ${Math.floor(n/5)} gate${Math.floor(n/5)===1?'':'s'} and ${n%5} line${n%5===1?'':'s'}.`}}
+       const labs=shuffle(['Koala','Kangaroo','Wombat','Echidna']).slice(0,3);const rows=labs.map(l=>({label:l,n:R(2,12)}));return {q:`Favourite animal survey. How many children chose ${rows[0].label} or ${rows[1].label}?`,vis:tallyChart(rows),type:'num',ans:rows[0].n+rows[1].n,suf:'children',why:`${rows[0].label} ${rows[0].n} + ${rows[1].label} ${rows[1].n} = ${rows[0].n+rows[1].n}.`}}},
+    {id:'y2-picture', title:'Picture graphs', d:'One picture stands for one. Most, least, how many more.',
+     say:'“A picture graph shows data with pictures. In this graph, each circle stands for one child. To find how many chose something, count the circles in that row. The longest row is the most popular, and the shortest row is the least popular.”',
+     diagram:()=>picGraph([{label:'Swimming',n:6},{label:'Cricket',n:4},{label:'Netball',n:7},{label:'Footy',n:5}],1), caption:'Favourite sport. Netball has the most circles: 7.',
+     examples:[{q:'How many more children chose Netball than Cricket?',a:'Netball 7, Cricket 4. 7 − 4 = 3 more.'},
+               {q:'How many children are in the graph altogether?',a:'6 + 4 + 7 + 5 = 22 children.'}],
+     turn:'Ask your family their favourite fruit. Draw a picture graph with one circle for each person.',
+     gen(){return graphQ('pic',1)}},
+    {id:'y2-column', title:'Column graphs', d:'Read graphs where the scale goes up in ones.',
+     say:'“A column graph uses bars instead of pictures. Look along from the top of the bar to the numbers on the side to read how many. The tallest bar is the most popular. Always check the title so you know what the graph is about.”',
+     diagram:()=>colGraph(['Mango','Apple','Banana','Grapes'],[7,4,6,2],1,8,'Our favourite fruit'), caption:'Each line on the side is worth 1. Mango is the tallest bar: 7.',
+     examples:[{q:'Which fruit is the least popular?',a:'Grapes has the shortest bar: 2.'},
+               {q:'How many children chose Mango or Banana?',a:'7 + 6 = 13 children.'}],
+     turn:'Turn your tally from the window watch into a column graph on grid paper. Give it a title.',
+     gen(){return graphQ('col',1)}}
+  ]}
+  ],
+  review:{id:'y2-review', title:'Year 2 mixed review', d:'10 questions from all nine lessons. Try it at the end of term.'}
+};
+
+function graphQ(kind,per){
+  const sets=[['Swimming','Cricket','Netball','Footy'],['Mango','Apple','Banana','Grapes'],['Koala','Wombat','Kangaroo','Echidna'],['Car','Bus','Walk','Bike'],['Slide','Swings','Monkey bars','Sandpit']];
+  const labels=P(sets),scale=kind==='col'?per:1;
+  let max, vals;
+  if(per===1){vals=labels.map(()=>R(1,9));max=10}
+  else if(kind==='pic'){vals=labels.map(()=>R(2,14))}
+  else if(per===2){vals=labels.map(()=>R(2,19));max=20}
+  else {vals=labels.map(()=>5*R(1,6));max=30}
+  const vis=kind==='pic'?picGraph(labels.map((l,i)=>({label:l,n:vals[i]})),per):colGraph(labels,vals,scale,max,P(['Class survey','Our survey','Favourites']));
+  const t=R(0,3);const i=R(0,3);let j=R(0,3);while(j===i)j=R(0,3);
+  const keyNote=kind==='pic'&&per===2?' Remember the key: each circle is 2, a half circle is 1.':kind==='col'&&per>1?` The scale goes up in ${per}s.`:'';
+  if(t===0)return {q:`How many chose ${labels[i]}?${kind==='pic'&&per===2?' Read the key first.':''}`,vis,type:'num',ans:vals[i],why:kind==='pic'&&per===2?`${Math.floor(vals[i]/2)} circles × 2 = ${Math.floor(vals[i]/2)*2}${vals[i]%2?' plus a half circle (1) = '+vals[i]:''}.`:`The ${labels[i]} ${kind==='pic'?'row':'bar'} shows ${vals[i]}.${keyNote}`};
+  if(t===1){const [a,b]=vals[i]>=vals[j]?[i,j]:[j,i];if(vals[a]===vals[b])return graphQ(kind,per);return {q:`How many more chose ${labels[a]} than ${labels[b]}?`,vis,type:'num',ans:vals[a]-vals[b],why:`${labels[a]} ${vals[a]} − ${labels[b]} ${vals[b]} = ${vals[a]-vals[b]}.${keyNote}`}}
+  if(t===2){const most=Math.random()<.5;const target=most?Math.max(...vals):Math.min(...vals);if(vals.filter(v=>v===target).length>1)return graphQ(kind,per);const k=vals.indexOf(target);return {q:`Which was chosen the ${most?'most':'least'}?`,vis,type:'choice',ans:labels[k],ch:labels.slice(),why:`${labels[k]} has the ${most?'longest':'shortest'} ${kind==='pic'?'row':'bar'}: ${target}.`}}
+  const tot=vals.reduce((a,b)=>a+b,0);return {q:'How many were asked altogether?',vis,type:'num',ans:tot,why:`${vals.join(' + ')} = ${tot}.`};
+}
+
+const AMPM=[['Eating breakfast at 7:30','am'],['Bedtime at 8:00','pm'],['School starts at 9:00','am'],['Afternoon tea at 3:30','pm'],['Dinner at 6:30','pm'],['Waking up at 6:45','am'],['Soccer practice at 4:15','pm'],['Morning recess at 10:45','am'],['The moon is out at 11:00','pm'],['Walking the dog at 7:00 before school','am']];
+
+const Y3 = {
+  id:'y3', name:'Year 3', tag:'next',
+  intro:'The next step, from Asmi\'s Year 3 Advanced Kit. The same three topics, now to Level 3: clocks to the minute and elapsed time, litres, millilitres, kilograms and grams, and graphs where one symbol or line stands for more than one.',
+  units:[
+  {title:'Time and Calendar', strand:'Measurement · time', weeks:'Weeks 1–3', lessons:[
+    {id:'y3-calendar', title:'Months, years and leap years', d:'Leap years, and the leftover-days trick for weekdays.',
+     say:'“A normal year has 365 days, which is 52 weeks and 1 extra day. That extra day is why your birthday moves to a different weekday each year! Every four years we add one extra day, 29 February, to make a leap year with 366 days. 2028 is the next leap year. Look at the calendar for February 2027. It has exactly 28 days, which is exactly 4 weeks. So March starts on the same weekday as February.”',
+     diagram:()=>calendar(2027,1,{5:'Dentist',10:'Swim',17:'Excursion',26:'Birthday'}), caption:'February 2027 has 28 days = 4 full weeks, so 1 March 2027 is also a Monday.',
+     facts:['30 days: September, April, June, November','31 days: all the others, except February (28 days, or 29 in a leap year)','Leap years are divisible by 4: 2024, 2028, 2032…','Seasons in Australia: Summer (Dec–Feb) · Autumn (Mar–May) · Winter (Jun–Aug) · Spring (Sep–Nov)'],
+     examples:[{q:'If 1 February 2027 is a Monday, what weekday is 1 April 2027?',a:'February has 28 days and March has 31 days: 28 + 31 = 59 days. 59 ÷ 7 = 8 weeks and 3 days left over. Monday + 3 days = Thursday. (Each whole week brings us back to the same day, so we only count the leftover days.)'},
+               {q:'How many weeks and days are in a normal year?',a:'365 ÷ 7 = 52 remainder 1. That is 52 weeks and 1 day. 52 × 7 = 364, and 364 + 1 = 365.'}],
+     turn:'If 1 March 2027 is a Monday, what weekday is 1 April 2027? (Hint: March has 31 days. How many days are left over after whole weeks?)',
+     gen(){const t=R(0,3);
+       if(t===0){const s=R(0,6),n=R(8,40),e=(s+n)%7,w=Math.floor(n/7),r=n%7;return {q:`Today is ${DAYS[s]}. What day of the week will it be in ${n} days?`,type:'choice',ans:DAYS[e],ch:opts(DAYS[e],DAYS),why:`${n} = ${w} week${w===1?'':'s'} and ${r} day${r===1?'':'s'}. Whole weeks bring you back to ${DAYS[s]}, then count on ${r}: ${DAYS[e]}.`}}
+       if(t===1){if(Math.random()<.5){const leap=P([2024,2028,2032,2036]);const ds=shuffle([2025,2026,2027,2029,2030,2031,2033]).slice(0,3);return {q:'Which of these is a leap year?',type:'choice',ans:String(leap),ch:shuffle([String(leap),...ds.map(String)]),why:`${leap} ÷ 4 = ${leap/4} exactly, so it is a leap year.`}}
+         const f=P([['How many days are in a leap year?',366,'A leap year has the extra day, 29 February: 365 + 1 = 366.'],['How many days are in a normal year?',365,'52 weeks and 1 day = 365 days.'],['How many days does February have in a leap year?',29,'Leap years add 29 February.'],['How many months are in a year?',12,'January to December.']]);return {q:f[0],type:'num',ans:f[1],why:f[2]}}
+       if(t===2){if(Math.random()<.5){const w=R(2,8),d=R(1,6);return {q:`How many days are in ${w} weeks and ${d} days?`,type:'num',ans:w*7+d,suf:'days',why:`${w} × 7 = ${w*7}, plus ${d} = ${w*7+d}.`}}
+         const n=R(15,62);return {q:`How many whole weeks are in ${n} days?`,type:'num',ans:Math.floor(n/7),suf:'weeks',why:`${n} ÷ 7 = ${Math.floor(n/7)} remainder ${n%7}. So ${Math.floor(n/7)} whole weeks.`}}
+       const mo=R(0,10),s=(new Date(2027,mo,1).getDay()+6)%7,e=(s+MDAYS[mo])%7;return {q:`1 ${MONTHS[mo]} 2027 is a ${DAYS[s]}. What weekday is 1 ${MONTHS[mo+1]} 2027?`,type:'choice',ans:DAYS[e],ch:opts(DAYS[e],DAYS),why:`${MONTHS[mo]} has ${MDAYS[mo]} days = 4 weeks and ${MDAYS[mo]-28} day${MDAYS[mo]-28===1?'':'s'}. ${DAYS[s]} + ${MDAYS[mo]-28} = ${DAYS[e]}.`}}},
+    {id:'y3-clock', title:'Clocks to the minute, am and pm', d:'Past, to, digital time and am/pm.',
+     say:'“Last year you read clocks to the quarter hour. Now we can read every minute! The long hand shows minutes. Count by fives as you go around: 5, 10, 15, 20, 25, and then count on by ones. When the long hand is on the right side, we say ‘past’. When it is on the left side, we say ‘to’. At 4:23 the long hand has gone past 20 and 3 more little marks, so it is 23 minutes past 4.” Then: “‘am’ is from midnight to noon (morning). ‘pm’ is from noon to midnight (afternoon and night).”',
+     diagram:()=>`<div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center">${clock(4,23,140)}${clock(7,50,140)}${clock(10,7,140)}</div>`, caption:'23 minutes past 4 · 10 minutes to 8 · 7 minutes past 10',
+     table:{head:['Words','Digital','Think'],rows:[['23 minutes past 4','4:23','23 minutes after 4 o’clock'],['quarter past 7','7:15','15 minutes past 7'],['half past 9','9:30','30 minutes past 9'],['quarter to 3','2:45','15 minutes before 3, so the hour is still 2'],['10 minutes to 8','7:50','60 − 50 = 10 minutes to go until 8'],['7 minutes to 12','11:53','60 − 53 = 7']]},
+     examples:[{q:'The short hand is just past 9 and the long hand is on 8. What time is it?',a:'The long hand on 8 means 8 × 5 = 40 minutes. The short hand has not reached 10 yet, so the hour is 9. The time is 9:40, or 20 minutes to 10.'},
+               {q:'Is dinner at 6:30 am or 6:30 pm?',a:'Dinner is in the evening, after noon, so it is 6:30 pm.'}],
+     turn:'Write 25 minutes to 6 as a digital time. (Hint: 25 minutes before 6 o’clock is… what minute past 5?)',
+     gen(){const t=R(0,3),h=R(1,12);
+       if(t===0){const m=Math.random()<.5?5*R(1,11):R(1,59);const ans=fmt(h,m);const ds=[fmt(nextH(h),m),fmt(h,(60-m)%60||30),fmt(h,(m+5)%60),fmt(prevH(h),m),fmt(h,(m+10)%60)];return {q:'What time does the clock show?',vis:clock(h,m),type:'choice',ans,ch:opts(ans,ds),why:`Count the long hand by fives then ones: ${m} minutes. The short hand has passed ${h} but not reached ${nextH(h)}, so it is ${ans} (${words(h,m)}).`}}
+       if(t===1){const m=P([5,10,20,25,35,40,50,55,8,12,52,47]);const w=words(h,m);const ans=fmt(h,m);const ds=m>30?[fmt(nextH(h),60-m),fmt(nextH(h),m),fmt(h,60-m)]:[fmt(prevH(h),m),fmt(h,60-m),fmt(nextH(h),m)];return {q:`Write “${w}” as a digital time.`,type:'choice',ans,ch:opts(ans,ds),why:m>30?`${60-m} minutes before ${nextH(h)} o'clock is ${m} minutes past ${h}: ${ans}.`:`${m} minutes after ${h} o'clock is ${ans}.`}}
+       if(t===2){const a=P(AMPM);return {q:`am or pm? ${a[0]}.`,type:'choice',ans:a[1],ch:['am','pm'],why:a[1]==='am'?'This happens in the morning, between midnight and noon.':'This happens after noon, in the afternoon or night.'}}
+       const m=P([10,20,25,35,40,50,55,5]);const ans=words(h,m);const ds=m<30?[`${60-m} minutes to ${nextH(h)}`,`${m} minutes past ${nextH(h)}`,`${m} minutes to ${h}`]:[`${m} minutes past ${h}`,`${60-m} minutes to ${h}`,`${60-m} minutes past ${nextH(h)}`];return {q:`Which words match ${fmt(h,m)}?`,type:'choice',ans,ch:opts(ans,ds),why:m<30?`The minutes are less than 30, so we say past: ${ans}.`:`60 − ${m} = ${60-m} minutes to go until ${nextH(h)}: ${ans}.`}}},
+    {id:'y3-elapsed', title:'Units of time and elapsed time', d:'Convert units, find how long, read a timetable.',
+     say:'“Elapsed time means how much time has passed between a start time and an end time. Use a number line. Jump to the next hour first, then add the hours, then add the leftover minutes. For example, from 3:45 to 5:10, jump 15 minutes to 4:00, then 1 hour to 5:00, then 10 minutes to 5:10. Add the jumps: 15 + 60 + 10 = 85 minutes, which is 1 hour 25 minutes.”',
+     diagram:numberLineTime, caption:'3:45 to 5:10 is 15 + 60 + 10 = 85 minutes = 1 hour 25 minutes.',
+     table:{head:['Unit','Equals','Real-life example'],rows:[['1 minute','60 seconds','Brushing your teeth ≈ 2 minutes = 120 seconds'],['1 hour','60 minutes','A school lesson is about 1 hour'],['1 day','24 hours','2 days = 48 hours'],['1 week','7 days','3 weeks = 21 days'],['1 year','12 months, 52 weeks, 365 days','A leap year has 366 days']]},
+     examples:[{q:'School starts at 9:00 am and finishes at 3:30 pm. How long is the school day?',a:'9:00 am to 3:00 pm is 6 hours. Then 30 more minutes. Total 6 hours 30 minutes.'},
+               {q:'A movie starts at 2:20 pm and runs for 95 minutes. When does it finish?',a:'95 minutes = 1 hour 35 minutes. 2:20 + 1 hour = 3:20. 3:20 + 35 minutes = 3:55 pm.'},
+               {q:'How many minutes are in 2 hours 15 minutes?',a:'2 × 60 = 120. 120 + 15 = 135 minutes.'}],
+     turn:'Soccer practice starts at 4:15 pm and finishes at 5:40 pm. How long was practice? Draw jumps on a number line to show your thinking.',
+     gen(){const t=R(0,3);
+       if(t===0){const f=P([()=>{const n=R(2,4);return [`${n} hours = ? minutes`,n*60,'minutes',`${n} × 60 = ${n*60}.`]},()=>{const n=R(2,5);return [`${n} minutes = ? seconds`,n*60,'seconds',`${n} × 60 = ${n*60}.`]},()=>{const n=R(2,3);return [`${n} days = ? hours`,n*24,'hours',`${n} × 24 = ${n*24}.`]},()=>{const n=R(2,6);return [`${n} weeks = ? days`,n*7,'days',`${n} × 7 = ${n*7}.`]},()=>{const n=R(61,115);return [`${n} minutes = 1 hour and ? minutes`,n-60,'minutes',`${n} − 60 = ${n-60}.`]},()=>{const h=R(1,2),m=5*R(1,11);return [`${h} hour${h>1?'s':''} ${m} minutes = ? minutes`,h*60+m,'minutes',`${h} × 60 = ${h*60}, plus ${m} = ${h*60+m}.`]}])();return {q:f[0],type:'num',ans:f[1],suf:f[2],why:f[3]}}
+       if(t===1){const h=R(1,8),m=5*R(0,11),d=5*R(4,19);const [H,M]=addMin(h,m,d);const to=60-m;return {q:`${P(['Swimming','Piano','Soccer practice','A birthday party','The bus trip'])} starts at ${fmt(h,m)} pm and finishes at ${fmt(H,M)} pm. How many minutes is that?`,type:'num',ans:d,suf:'minutes',why:m===0||d<=to?`Count on from ${fmt(h,m)} to ${fmt(H,M)}: ${d} minutes.`:`Jump ${to} minutes to ${nextH(h)}:00, then ${d-to} more to ${fmt(H,M)}. ${to} + ${d-to} = ${d} minutes.`}}
+       if(t===2){const h=R(1,7),m=5*R(0,11),d=5*R(5,21);const [H,M]=addMin(h,m,d);const ans=fmt(H,M)+' pm';const ds=[fmt(...addMin(h,m,d+10))+' pm',fmt(...addMin(h,m,d-10))+' pm',fmt(...addMin(h,m,d+60))+' pm',fmt(...addMin(h,m,d-5))+' pm'];return {q:`A film starts at ${fmt(h,m)} pm and runs for ${d} minutes. When does it end?`,type:'choice',ans,ch:opts(ans,ds),why:d>=60?`${d} minutes = 1 hour ${d-60} minutes. ${fmt(h,m)} + 1 hour = ${fmt(nextH(h),m)}, then + ${d-60} minutes = ${fmt(H,M)} pm.`:`${fmt(h,m)} + ${d} minutes = ${fmt(H,M)} pm.`}}
+       const st=['Ashwood','Burnley','Carlton','Docklands'];let mins=[R(0,4)*5+5];for(let k=0;k<3;k++)mins.push(mins[k]+R(10,25));const times=mins.map(x=>{const[H,M]=addMin(8,0,x);return fmt(H,M)+' am'});
+       const a=R(0,2),b=R(a+1,3);const vis=`<div class="tablewrap"><table class="tt"><tr><th>Station</th>${st.map(s=>`<th>${s}</th>`).join('')}</tr><tr><td><b>Departs</b></td>${times.map(x=>`<td>${x}</td>`).join('')}</tr></table></div>`;
+       return {q:`How long does the train take from ${st[a]} to ${st[b]}?`,vis,type:'num',ans:mins[b]-mins[a],suf:'minutes',why:`${times[a]} to ${times[b]} is ${mins[b]-mins[a]} minutes.`}}}
+  ]},
+  {title:'Capacity and Mass', strand:'Measurement · capacity and mass', weeks:'Weeks 4–6', lessons:[
+    {id:'y3-units', title:'Standard units and benchmarks', d:'mL, L, g and kg. Estimate and convert.',
+     say:'“Last term you measured with cups and found that different cups gave different answers. That is why the world agreed on standard units that are the same everywhere. For liquids we use millilitres (mL) and litres (L). For how heavy something is, we use grams (g) and kilograms (kg). ‘Milli’ means one thousandth, and ‘kilo’ means one thousand. That is why 1 litre has 1000 millilitres and 1 kilogram has 1000 grams.”',
+     table:{head:['Capacity','Mass'],rows:[['A teaspoon holds about 5 mL','A paperclip is about 1 g'],['A metric measuring cup holds 250 mL','An apple is about 150–200 g'],['A small drink bottle holds about 600 mL','A packet of butter is 250 g'],['A milk carton holds 1 L or 2 L','A bag of sugar or flour is 1 kg'],['A bucket holds about 10 L','A school bag is about 3–5 kg']]},
+     examples:[{q:'Which is more: 1 L 200 mL or 1500 mL? How much more?',a:'1 L 200 mL = 1200 mL. 1500 − 1200 = 300. 1500 mL is more, by 300 mL.'},
+               {q:'Would you measure the mass of a watermelon in grams or kilograms?',a:'Kilograms. A watermelon is heavy, about 3 to 5 kg.'}],
+     turn:'Benchmark hunt: find three things at home that you think weigh about 500 g, 1 kg and 250 g. Check them on the scale.',
+     gen(){const t=R(0,3);
+       if(t===0){const it=P([['the water in a bathtub','L'],['medicine on a spoon','mL'],['a watermelon','kg'],['a strawberry','g'],['a bucket of water','L'],['a cup of milk','mL'],['a bag of potatoes','kg'],['a slice of bread','g'],['a swimming pool','L'],['a teaspoon of vanilla','mL'],['a dog','kg'],['a pencil','g']]);const isCap=['L','mL'].includes(it[1]);return {q:`Which unit would you use to measure ${it[0]}?`,type:'choice',ans:it[1],ch:['mL','L','g','kg'],why:`${isCap?'It is a liquid amount, so capacity':'It is how heavy, so mass'}. ${it[1]==='mL'||it[1]==='g'?'It is small, so the small unit':'It is big, so the big unit'}: ${it[1]}.`}}
+       if(t===1){const b=P([['How much does a teaspoon hold?','5 mL',['250 mL','1 L','50 mL']],['How much does a metric measuring cup hold?','250 mL',['5 mL','25 mL','2 L']],['About how heavy is an apple?','150 g',['15 g','1 kg','5 kg']],['About how heavy is a paperclip?','1 g',['100 g','1 kg','50 g']],['How heavy is a packet of butter?','250 g',['25 g','2 kg','5 g']],['About how much does a bucket hold?','10 L',['10 mL','100 mL','1 L']],['About how heavy is a school bag?','4 kg',['4 g','40 kg','400 g']],['How much does a small drink bottle hold?','600 mL',['6 mL','6 L','60 L']]]);return {q:b[0],type:'choice',ans:b[1],ch:opts(b[1],b[2]),why:`Benchmark: ${b[0].replace(/^(How much does|About how much does|About how heavy is|How heavy is) /,'').replace('?','')} ≈ ${b[1]}.`}}
+       if(t===2){const f=P([()=>{const n=R(2,5);return [`${n} L = ? mL`,n*1000,'mL',`1 L = 1000 mL, so ${n} L = ${n*1000} mL.`]},()=>{const n=R(2,5);return [`${n} kg = ? g`,n*1000,'g',`1 kg = 1000 g, so ${n} kg = ${n*1000} g.`]},()=>{const a=R(1,3),b=50*R(1,19);return [`${a} L ${b} mL = ? mL`,a*1000+b,'mL',`${a} L = ${a*1000} mL, plus ${b} = ${a*1000+b} mL.`]},()=>{const a=R(1,3),b=50*R(1,19);return [`${a} kg ${b} g = ? g`,a*1000+b,'g',`${a} kg = ${a*1000} g, plus ${b} = ${a*1000+b} g.`]},()=>{const a=R(1,3),b=100*R(1,9);return [`${a*1000+b} g = ${a} kg and ? g`,b,'g',`${a*1000+b} − ${a*1000} = ${b} g.`]},()=>{const a=R(1,3),b=100*R(1,9);return [`${a*1000+b} mL = ${a} L and ? mL`,b,'mL',`${a*1000+b} − ${a*1000} = ${b} mL.`]}])();return {q:f[0],type:'num',ans:f[1],suf:f[2],why:f[3]}}
+       const kind=P(['L','kg']),small=kind==='L'?'mL':'g';const a=R(1,2),b=100*R(1,8);let c=a*1000+100*R(-6,6);if(c===a*1000+b)c+=100;const A=`${a} ${kind} ${b} ${small}`,B=`${c} ${small}`;const more=c>a*1000+b?B:A;return {q:`Which is more: ${A} or ${B}?`,type:'choice',ans:more,ch:[A,B],why:`${A} = ${a*1000+b} ${small}. Compare with ${c} ${small}: ${more} is more by ${Math.abs(c-(a*1000+b))} ${small}.`}}},
+    {id:'y3-jug', title:'Reading a scaled jug', d:'Work out what each little mark is worth.',
+     say:'“Look at the marks on the jug. The long marks are every 100 mL and are labelled. The short marks are in between, at every 50 mL. The water level is exactly halfway between 600 and 700, so we read it as 650 mL. When the level is between two marks, work out what each little mark is worth first!”',
+     diagram:()=>jug(650), caption:'The water is halfway between 600 and 700: 650 mL.',
+     examples:[{q:'How many 250 mL cups fill a 1 L jug?',a:'1 L = 1000 mL. Count by 250s: 250, 500, 750, 1000. That is 4 cups.'},
+               {q:'Mum buys 3 bottles of juice. Each holds 600 mL. How much juice is that altogether? Write it in mL and in L and mL.',a:'3 × 600 = 1800 mL. 1800 mL = 1000 mL + 800 mL = 1 L 800 mL.'}],
+     turn:'Pancake mix needs 300 mL of milk and 250 mL of water. How much liquid is that altogether? How much milk is left in a 1 L carton?',
+     gen(){const t=R(0,3);
+       if(t===0){const v=50*R(2,19);return {q:'How much water is in the jug?',vis:jug(v),type:'num',ans:v,suf:'mL',why:`The labels go up in 100s and each little mark is 50 mL. The water is at ${v} mL.`}}
+       if(t===1){const v=100*R(1,9);return {q:'Careful: this jug is labelled every 200 mL. How much water is in it?',vis:jug(v,1000,200,100),type:'num',ans:v,suf:'mL',why:`Between 0 and 200 there is one little mark, so each little mark is 100 mL. The water is at ${v} mL.`}}
+       if(t===2){const c=P([250,500,200,100]),L=c===100?1:R(1,3);return {q:`How many ${c} mL cups fill a ${L} L jug?`,type:'num',ans:L*1000/c,suf:'cups',why:`${L} L = ${L*1000} mL. ${L*1000} ÷ ${c} = ${L*1000/c}.`}}
+       if(Math.random()<.5){const b=P([600,500,750]),d=R(110,b-50);return {q:`A bottle holds ${b} mL. Tom drinks ${d} mL. How much is left?`,type:'num',ans:b-d,suf:'mL',why:`${b} − ${d} = ${b-d} mL.`}}
+       const k=R(2,4),b=P([250,300,400,600]);return {q:`Each glass holds ${b} mL. How much do ${k} glasses hold altogether?`,type:'num',ans:k*b,suf:'mL',why:`${k} × ${b} = ${k*b} mL${k*b>=1000?` = ${Math.floor(k*b/1000)} L ${k*b%1000} mL`:''}.`}}},
+    {id:'y3-scale', title:'Reading scales for mass', d:'Kitchen scale dials, totals and differences.',
+     say:'“A kitchen scale tells us the mass of food in grams. This dial goes all the way around once for 1000 g, which is 1 kilogram. The big marks are every 100 g, and the little marks are every 50 g. The pointer is halfway between 700 and 800, so the mass is 750 g, which is three-quarters of a kilogram.”',
+     diagram:()=>dial(750), caption:'Halfway between 700 and 800: 750 g.',
+     examples:[{q:'A recipe uses 1 kg of flour, 500 g of sugar and 250 g of butter. What is the total mass?',a:'1 kg = 1000 g. 1000 + 500 + 250 = 1750 g = 1 kg 750 g.'},
+               {q:'A shopping bag can hold 2 kg. It has 1 kg 500 g in it. How much more can it hold?',a:'2 kg = 2000 g. 1 kg 500 g = 1500 g. 2000 − 1500 = 500 g.'}],
+     turn:'Order these from lightest to heaviest: 1 kg 800 g, 1 kg 200 g, 950 g. (Hint: change them all to grams first.)',
+     gen(){const t=R(0,3);
+       if(t===0){const g=50*R(1,19);return {q:'What mass does the scale show?',vis:dial(g),type:'num',ans:g,suf:'g',why:`Big marks are every 100 g, little marks every 50 g. The pointer is at ${g} g.`}}
+       if(t===1){if(Math.random()<.5){const k=R(2,6),b=P([250,200,500,150]);return {q:`${k} bags of rice each have a mass of ${b} g. What is their total mass in grams?`,type:'num',ans:k*b,suf:'g',why:`${k} × ${b} = ${k*b} g.`}}
+         const a=R(140,200),b=R(140,200),c=R(140,200);return {q:`Three apples have masses ${a} g, ${b} g and ${c} g. What is their total mass?`,type:'num',ans:a+b+c,suf:'g',why:`${a} + ${b} = ${a+b}, then + ${c} = ${a+b+c} g.`}}
+       if(t===2){if(Math.random()<.5){const u=50*R(2,18);return {q:`A 1 kg packet of flour. Mia uses ${u} g. How much flour is left?`,type:'num',ans:1000-u,suf:'g',why:`1 kg = 1000 g. 1000 − ${u} = ${1000-u} g.`}}
+         const h=100*R(1,9);return {q:`A bag can hold 2 kg. It has 1 kg ${h} g in it. How many more grams can it hold?`,type:'num',ans:1000-h,suf:'g',why:`2 kg = 2000 g. 1 kg ${h} g = ${1000+h} g. 2000 − ${1000+h} = ${1000-h} g.`}}
+       const base=[50*R(17,19),1000+100*R(1,4),1000+100*R(5,9)];const lab=base.map(g=>g>=1000?`1 kg ${g-1000} g`:`${g} g`);const light=Math.random()<.5;const k=light?0:2;return {q:`Which is the ${light?'lightest':'heaviest'}?`,type:'choice',ans:lab[k],ch:shuffle(lab),why:`In grams: ${base.join(' g, ')} g. The ${light?'smallest':'biggest'} is ${lab[k]}.`}}}
+  ]},
+  {title:'Data Collection', strand:'Statistics', weeks:'Weeks 7–9', lessons:[
+    {id:'y3-survey', title:'Asking questions and collecting data', d:'Categorical or numerical? Writing good survey questions.',
+     say:'“Data is information we collect to answer a question. Some data is in categories, like favourite colour. Some data is numbers, like how many pets someone has. Before we collect, we decide: What is my question? Who will I ask? How will I record the answers? A good survey question has choices people can pick from, and an ‘other’ choice just in case.”',
+     table:{head:['Type','What it is','Examples'],rows:[['Categorical','Answers are words or groups','Favourite sport · pet type · way you travel to school'],['Numerical','Answers are numbers (you can count or measure)','Number of siblings · shoe size · minutes spent reading']]},
+     examples:[{q:'Is this categorical or numerical? (a) What is your favourite fruit? (b) How many books did you read this month?',a:'(a) Categorical: the answers are fruit names. (b) Numerical: the answers are numbers.'},
+               {q:'Improve this survey question: “What do you like?”',a:'It is too open and people will give hundreds of answers. Better: “What is your favourite playground activity? (slide / swings / monkey bars / sandpit / other)”'}],
+     turn:'Write one categorical question and one numerical question you could ask your family. Say who you would ask.',
+     gen(){const t=R(0,3);const Q=[['What is your favourite colour?','categorical'],['How many brothers and sisters do you have?','numerical'],['How do you travel to school?','categorical'],['What is your shoe size?','numerical'],['What pet do you have?','categorical'],['How many minutes did you read last night?','numerical'],['Which season do you like best?','categorical'],['How tall are you in centimetres?','numerical'],['What is your favourite sport?','categorical'],['How many teeth have you lost?','numerical']];
+       if(t<=1){const q=P(Q);return {q:`Is the answer to this question categorical or numerical? “${q[0]}”`,type:'choice',ans:q[1],ch:['categorical','numerical'],why:q[1]==='categorical'?'The answers are words or groups.':'The answers are numbers you can count or measure.'}}
+       if(t===2){const g=P([['What is your favourite fruit? (mango / apple / banana / grapes / other)',['What do you like?','Do you like food?','Tell me about fruit.']],['How do you get to school? (walk / car / bus / bike / other)',['How?','Do you go to school?','What about school?']],['Which sport do you play most? (soccer / netball / swimming / cricket / other)',['Sport?','Do you like sport or not or maybe?','What do you do?']]]);return {q:'Which is the best survey question?',type:'choice',ans:g[0],ch:shuffle([g[0],...g[1]]),why:'A good survey question is clear and gives choices, plus “other” just in case.'}}
+       const rows=shuffle(['Walk','Car','Bus','Bike']).map(l=>({label:l,n:R(2,11)}));const tot=rows.reduce((a,b)=>a+b.n,0);return {q:'How do you travel to school? How many people were asked altogether?',vis:tallyChart(rows),type:'num',ans:tot,suf:'people',why:`${rows.map(r=>r.n).join(' + ')} = ${tot}.`}}},
+    {id:'y3-picture', title:'Picture graphs with a key', d:'One symbol stands for 2. A half symbol is 1.',
+     say:'“A picture graph uses symbols to show data. If we have lots of data, we do not draw one symbol for every person. We use a key. Here, one circle stands for 2 children. A half circle means 1 child. So 4 and a half circles means 4 × 2 + 1 = 9 children. Always read the key before you read the graph!”',
+     diagram:()=>picGraph([{label:'Dog',n:12},{label:'Cat',n:9},{label:'Fish',n:4},{label:'Bird',n:7}],2), caption:'Favourite pet. Key: one circle = 2 children.',
+     examples:[{q:'How many children chose cat? How many more chose dog than cat?',a:'Cat has 4 whole circles and a half: 4 × 2 + 1 = 9. Dog has 6 circles: 12. 12 − 9 = 3 more.'},
+               {q:'How many children were asked altogether?',a:'12 + 9 + 4 + 7 = 32 children. (Check: 12 + 9 = 21, 21 + 4 = 25, 25 + 7 = 32.)'}],
+     turn:'If 6 more children chose fish, would fish be the most popular pet? Explain with numbers.',
+     gen(){return graphQ('pic',2)}},
+    {id:'y3-column', title:'Column graphs with a scale', d:'Scales in 2s and 5s. Read between the lines.',
+     say:'“A column graph uses bars. The scale on the side tells us the number each line is worth. Here the scale goes up in 2s: 0, 2, 4, 6… If a bar ends halfway between two lines, it is worth the number in the middle. The Orange bar ends between 8 and 10, so it is 9. A good graph has a title, labelled axes and a scale that goes up evenly.”',
+     diagram:()=>colGraph(['Mango','Apple','Orange','Banana','Grapes'],[14,8,9,12,6],2,16,'Favourite fruit'), caption:'The scale goes up in 2s. Orange ends halfway between 8 and 10, so it is 9.',
+     facts:['Title: does it say what the data is about?','Labels: are both axes labelled?','Scale: does it start at 0 and go up evenly?','Key: if there are symbols, does the key say what each one is worth?','Would the graph look different if the scale started at 6 instead of 0? Yes! A graph can mislead.'],
+     examples:[{q:'Which fruit is the most popular and which is the least? What is the difference between them?',a:'Most: Mango (14). Least: Grapes (6). 14 − 6 = 8.'},
+               {q:'How many children chose Apple or Orange?',a:'8 + 9 = 17 children.'},
+               {q:'More than half of the 49 children chose which fruits? (Half of 49 is 24 and a half.)',a:'Mango + Banana = 14 + 12 = 26. 26 is more than 24½. Mango and Banana together are chosen by more than half.'}],
+     turn:'Write two true statements about the fruit graph, such as “Banana was chosen by 4 more children than Apple.” Check each with the graph.',
+     gen(){return graphQ('col',P([2,2,5]))}}
+  ]}
+  ],
+  project:{id:'y3-project', title:'Family Cook-Up Day', d:'Week 10 project: plan a cook-up using time, capacity, mass and data.'},
+  review:{id:'y3-review', title:'Year 3 mixed review', d:'10 questions from all nine Year 3 lessons.'}
+};
+
+const PROJECT=[
+  {q:'Step 1 · Choose a date. 1 March 2027 is a Monday. March has 31 days. What weekday is 1 April 2027?',vis:calendar(2027,2,{13:'Cook-up?',14:'Cook-up?'}),type:'choice',ans:'Thursday',ch:['Monday','Wednesday','Thursday','Saturday'],why:'31 days = 4 weeks and 3 days. Monday + 3 days = Thursday.'},
+  {q:'Step 2 · Plan the schedule. Cooking starts at 10:15 am and takes 1 hour 45 minutes. When does cooking finish?',type:'choice',ans:'12:00 noon',ch:['11:45 am','12:00 noon','12:15 pm','11:00 am'],why:'10:15 + 1 hour = 11:15. 11:15 + 45 minutes = 12:00 noon.'},
+  {q:'Step 2 · Lunch is at 12:30 pm. Cooking finished at 12:00 noon. How many minutes is the wait?',type:'num',ans:30,suf:'minutes',why:'12:00 to 12:30 is 30 minutes.'},
+  {q:'Step 3 · Measure the lemonade. Each of 8 guests gets 250 mL. How many millilitres is that?',type:'num',ans:2000,suf:'mL',why:'8 × 250 = 2000 mL.'},
+  {q:'Step 3 · How many litres is 2000 mL?',vis:jug(1000,1000,100,50,true,170),type:'num',ans:2,suf:'L',why:'1000 mL = 1 L, so 2000 mL = 2 L. You need to fill this 1 L jug twice.'},
+  {q:'Step 4 · Weigh the ingredients. Pancakes for 4 people use 300 g of flour. How much flour for 8 people?',type:'num',ans:600,suf:'g',why:'8 is double 4, so double 300 g: 600 g.'},
+  {q:'Step 4 · You have a 1 kg bag of flour and use 600 g. How much is left?',vis:dial(600),type:'num',ans:400,suf:'g',why:'1 kg = 1000 g. 1000 − 600 = 400 g.'},
+  {q:'Step 5 · Survey the guests. What was the most popular dish?',vis:picGraph([{label:'Pancakes',n:8},{label:'Fruit salad',n:5},{label:'Sausage rolls',n:4},{label:'Pizza',n:3}],2,'guests'),type:'choice',ans:'Pancakes',ch:['Pancakes','Fruit salad','Sausage rolls','Pizza'],why:'Pancakes has 4 circles: 4 × 2 = 8 guests.'},
+  {q:'Step 5 · How many more guests chose Fruit salad than Pizza?',vis:picGraph([{label:'Pancakes',n:8},{label:'Fruit salad',n:5},{label:'Sausage rolls',n:4},{label:'Pizza',n:3}],2,'guests'),type:'num',ans:2,suf:'guests',why:'Fruit salad 2½ circles = 5. Pizza 1½ circles = 3. 5 − 3 = 2.'},
+  {q:'Step 5 · How many guests answered the survey altogether?',vis:picGraph([{label:'Pancakes',n:8},{label:'Fruit salad',n:5},{label:'Sausage rolls',n:4},{label:'Pizza',n:3}],2,'guests'),type:'num',ans:20,suf:'guests',why:'8 + 5 + 4 + 3 = 20 guests.'}
+];
+
+const LEVELS={y2:Y2,y3:Y3};
+const allLessons=lv=>lv.units.flatMap(u=>u.lessons);
+
+const HANDS={
+  y2:{'Time and Calendar':['Paper plate clock: parent calls a time, Asmi sets the hands. Swap!','Fridge calendar: mark family events and count the sleeps until each one.','Knuckle trick race: who can find the days in a month fastest?'],
+      'Capacity and Mass':['Bath-time pouring: which container holds the most cups?','Coat-hanger balance with two bags. Find heavier and lighter things.','Line up 4 fruits from lightest to heaviest by feel, then check with the balance.'],
+      'Data Collection':['Window watch: tally cars, bikes and walkers for 5 minutes.','Family favourite fruit survey, then draw a picture graph.','Sort LEGO by colour and make a real-object graph.']},
+  y3:{'Time and Calendar':['Clock builder: parent calls a time (e.g. 6:37). Asmi sets it. Swap!','How long is a minute? Close your eyes and put your hand up when you think 1 minute has passed.','Stopwatch challenge: time five tasks, then change seconds to minutes and seconds.','Plan a journey with a real timetable.','Day diary: write your Saturday on a timeline and work out how long each activity takes.'],
+      'Capacity and Mass':['Fill a litre: how many 250 mL cups fill 1 L? Then try a 125 mL cup.','Make lemonade for 8: each person gets 250 mL. How many litres?','Pancake baking: measure flour in grams and milk in mL. Double it. Halve it.','Benchmark hunt: find things that weigh about 500 g, 1 kg and 250 g.','Supermarket detective: read labels on 6 products and order them.'],
+      'Data Collection':['Big family survey: ask 20 people, tally, then graph (1 symbol = 2).','Weather watch: record the weather for 14 days.','Colour census: sort LEGO or buttons by colour.','Playground poll: what do people like best at the playground?','Graph detective: parent writes 3 questions about a graph, Asmi writes one back.']}
+};
+
+/* ---------- state ---------- */
+let state={level:'y2',tab:'learn',lesson:null};
+let scores={}, ready={};
+try{scores=JSON.parse(localStorage.getItem('asmiMaths.scores')||'{}')}catch(e){}
+try{ready=JSON.parse(localStorage.getItem('asmiMaths.ready')||'{}')}catch(e){}
+try{const l=localStorage.getItem('asmiMaths.level');if(l==='y2'||l==='y3')state.level=l}catch(e){}
+const save=()=>{try{localStorage.setItem('asmiMaths.scores',JSON.stringify(scores));localStorage.setItem('asmiMaths.ready',JSON.stringify(ready));localStorage.setItem('asmiMaths.level',state.level)}catch(e){}};
+const starsFor=(score,total)=>score/total>=.9?3:score/total>=.7?2:score/total>=.5?1:0;
+function totalStars(){return Object.values(scores).reduce((a,s)=>a+starsFor(s.best,s.total),0)}
+
+const view=document.getElementById('view');
+function setLevel(l){state.level=l;state.lesson=null;save();render()}
+document.getElementById('lvY2').onclick=()=>setLevel('y2');
+document.getElementById('lvY3').onclick=()=>setLevel('y3');
+document.getElementById('tabLearn').onclick=()=>{state.tab='learn';state.lesson=null;render()};
+document.getElementById('tabParent').onclick=()=>{state.tab='parent';state.lesson=null;render()};
+
+function render(){
+  document.getElementById('lvY2').setAttribute('aria-pressed',state.level==='y2');
+  document.getElementById('lvY3').setAttribute('aria-pressed',state.level==='y3');
+  document.getElementById('tabLearn').setAttribute('aria-selected',state.tab==='learn');
+  document.getElementById('tabParent').setAttribute('aria-selected',state.tab==='parent');
+  document.getElementById('starCount').textContent=totalStars();
+  if(state.tab==='parent')return renderParent();
+  if(state.lesson)return renderLesson(state.lesson);
+  renderHome();
+}
+
+function lessonCard(num,l,extra=''){
+  const s=scores[l.id];const st=s?starsFor(s.best,s.total):0;
+  return `<button class="lesson ${extra}" data-open="${l.id}"><span class="num">${num}</span><span class="t">${esc(l.title)}</span><span class="d">${esc(l.d)}</span><span class="row"><span class="mini-stars">${starsSVG(st)}</span><span>${s?`Best ${s.best}/${s.total}`:'Not started'}</span></span></button>`;
+}
+function renderHome(){
+  const lv=LEVELS[state.level];
+  let h=`<div class="wrap" style="gap:26px"><section class="intro"><span class="eyebrow">${lv.name} · ${lv.tag==='now'?'current level':'next level'}</span><h2>${lv.tag==='now'?'Year 2 review':'Getting ready for Year 3'}</h2><p>${esc(lv.intro)}</p></section>`;
+  lv.units.forEach((u,ui)=>{
+    h+=`<section class="unit"><div class="unit-head"><h2>${ui+1}. ${esc(u.title)}</h2><span class="muted" style="font-size:14px">${esc(u.strand)}${u.weeks?' · '+u.weeks:''}</span></div><div class="lessons">${u.lessons.map((l,li)=>lessonCard(`Lesson ${ui+1}.${li+1}`,l)).join('')}</div></section>`;
+  });
+  h+=`<section class="unit"><div class="unit-head"><h2>${lv.units.length+1}. ${lv.project?'Review and project':'Review'}</h2><span class="muted" style="font-size:14px">All strands${lv.project?' · Week 10':''}</span></div><div class="lessons">${lv.project?lessonCard('Project',lv.project,'review'):''}${lessonCard('Review',lv.review,'review')}</div></section></div>`;
+  view.innerHTML=h;
+  view.querySelectorAll('[data-open]').forEach(b=>b.onclick=()=>{state.lesson=b.dataset.open;render();window.scrollTo({top:0})});
+}
+
+function findLesson(id){
+  for(const lv of Object.values(LEVELS)){
+    if(lv.review.id===id)return {lv,l:lv.review,kind:'review'};
+    if(lv.project&&lv.project.id===id)return {lv,l:lv.project,kind:'project'};
+    for(const u of lv.units)for(const l of u.lessons)if(l.id===id)return {lv,u,l,kind:'lesson'};
+  }
+}
+function renderLesson(id){
+  const {lv,u,l,kind}=findLesson(id);
+  let h=`<div class="wrap"><button class="back" id="back">← All ${lv.name} lessons</button><div class="lesson-title"><span class="eyebrow">${lv.name}${u?' · '+esc(u.title):''}</span><h1 style="font-size:clamp(26px,5vw,34px)">${esc(l.title)}</h1></div>`;
+  if(kind==='lesson'){
+    h+=`<section class="panel"><div class="say"><span class="lab">Parent says</span><p>${esc(l.say)}</p></div>`;
+    if(l.diagram)h+=`<div class="diagram">${l.diagram()}</div>${l.caption?`<p class="caption">${esc(l.caption)}</p>`:''}`;
+    if(l.table)h+=`<div class="tablewrap"><table class="tt"><tr>${l.table.head.map(x=>`<th>${esc(x)}</th>`).join('')}</tr>${l.table.rows.map(r=>`<tr>${r.map(c=>`<td>${esc(c)}</td>`).join('')}</tr>`).join('')}</table></div>`;
+    if(l.facts)h+=`<div class="facts"><b>Handy facts to remember</b><ul>${l.facts.map(f=>`<li>${esc(f)}</li>`).join('')}</ul></div>`;
+    h+=`<h3>Worked examples</h3><div class="examples">${l.examples.map((e,i)=>`<details class="ex"><summary><span class="tag">Example ${i+1}</span><span>${esc(e.q)}</span><span class="reveal">Show</span></summary><div class="sol"><b>Solution:</b> ${esc(e.a)}</div></details>`).join('')}</div>`;
+    h+=`<div class="yourturn"><span class="lab">Your turn, on paper</span><p>${esc(l.turn)}</p></div></section>`;
+  } else if(kind==='project'){
+    h+=`<section class="panel"><div class="say"><span class="lab">Project overview</span><p>Plan a family cook-up day. Asmi is the head chef and event planner, so she will use time, capacity, mass and data skills at every step. Do the real cooking and pouring together, then answer the questions below.</p></div>
+    <div class="tablewrap"><table class="tt"><tr><th>Step</th><th>Job</th><th>Maths skill</th></tr>
+    <tr><td>1. Choose a date</td><td>Pick a Saturday or Sunday on the March 2027 calendar.</td><td>Calendar</td></tr>
+    <tr><td>2. Plan the schedule</td><td>Shopping 9:30 am. Cooking from 10:15 am for 1 hour 45 minutes. Lunch at 12:30 pm.</td><td>Elapsed time</td></tr>
+    <tr><td>3. Measure the lemonade</td><td>Each of 8 guests gets 250 mL.</td><td>Capacity</td></tr>
+    <tr><td>4. Weigh the ingredients</td><td>Pancakes for 4 use 300 g flour. Make enough for 8.</td><td>Mass</td></tr>
+    <tr><td>5. Survey</td><td>Ask 20 guests their favourite dish. Make a picture graph (1 symbol = 2).</td><td>Data</td></tr></table></div></section>`;
+  } else {
+    h+=`<section class="panel"><p>Ten questions mixed from every ${lv.name} lesson. Do this one without help, then look back at any lesson where Asmi got stuck.</p></section>`;
+  }
+  h+=`<section class="practice" id="practice"></section></div>`;
+  view.innerHTML=h;
+  document.getElementById('back').onclick=()=>{state.lesson=null;render();window.scrollTo({top:0})};
+  startPractice(id,kind,lv,l);
+}
+
+/* ---------- practice round ---------- */
+function speak(text){try{const u=new SpeechSynthesisUtterance(text);const v=speechSynthesis.getVoices().find(v=>/en-AU/i.test(v.lang))||speechSynthesis.getVoices().find(v=>/^en/i.test(v.lang));if(v)u.voice=v;u.rate=.92;speechSynthesis.cancel();speechSynthesis.speak(u)}catch(e){}}
+function makeQuestions(kind,lv,l){
+  if(kind==='project')return PROJECT.map(q=>({...q,ch:q.ch?shuffle(q.ch):q.ch}));
+  const gens=kind==='review'?allLessons(lv):[l];const n=kind==='review'?10:8;const out=[];const seen=new Set();
+  let guard=0;while(out.length<n&&guard<200){guard++;const g=kind==='review'?gens[out.length%gens.length===0?R(0,gens.length-1):R(0,gens.length-1)]:l;const q=g.gen();const key=q.q+'|'+q.ans;if(seen.has(key))continue;seen.add(key);out.push(q)}
+  return out;
+}
+function startPractice(id,kind,lv,l){
+  const box=document.getElementById('practice');
+  const qs=makeQuestions(kind,lv,l);let i=0,res=[],picked=null,answered=false;
+  const intro=kind==='lesson'?'Practice round':kind==='project'?'Cook-Up Day questions':'Mixed review';
+  function draw(){
+    if(i>=qs.length)return finish();
+    const q=qs[i];picked=null;answered=false;
+    box.innerHTML=`<div class="ph"><h3>${intro} · Question ${i+1} of ${qs.length}</h3><div class="dots">${qs.map((_,k)=>`<i class="${k<i?(res[k]?'ok':'no'):k===i?'now':''}"></i>`).join('')}</div></div>
+      <p class="qtext" id="qtext">${esc(q.q)}</p>
+      ${q.vis?`<div class="qvis">${q.vis}</div>`:''}
+      ${q.type==='num'?`<div class="answer"><label for="ans" class="muted" style="font-weight:700">Answer</label>${q.pre?`<span class="unitlab">${q.pre}</span>`:''}<input id="ans" type="text" inputmode="numeric" autocomplete="off">${q.suf?`<span class="unitlab">${esc(q.suf)}</span>`:''}</div>`
+        :`<div class="choices">${q.ch.map(c=>`<button class="choice" data-c="${esc(c)}">${q.chHTML&&q.chHTML[c]?q.chHTML[c]:esc(c)}</button>`).join('')}</div>`}
+      <div id="fb"></div>
+      <div class="actions"><button class="btn" id="check" ${q.type==='choice'?'disabled':''}>Check</button><button class="btn ghost small" id="read" type="button">Read it to me</button></div>`;
+    const check=box.querySelector('#check');
+    box.querySelector('#read').onclick=()=>speak(q.q);
+    if(q.type==='num'){const inp=box.querySelector('#ans');inp.focus({preventScroll:true});inp.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();check.click()}})}
+    else box.querySelectorAll('.choice').forEach(b=>b.onclick=()=>{if(answered)return;box.querySelectorAll('.choice').forEach(x=>x.classList.remove('sel'));b.classList.add('sel');picked=b.dataset.c;check.disabled=false});
+    check.onclick=()=>{
+      if(answered){i++;draw();box.scrollIntoView({behavior:'smooth',block:'start'});return}
+      let ok;
+      if(q.type==='num'){const raw=box.querySelector('#ans').value.replace(/[$,\s]|mL|kg|g|L|cm|min(ute)?s?|cups?|days?|weeks?|hours?|seconds?/gi,'');if(raw===''){box.querySelector('#ans').focus();return}ok=Math.abs(Number(raw)-Number(q.ans))<1e-9;box.querySelector('#ans').disabled=true}
+      else{if(picked==null)return;ok=picked===String(q.ans);box.querySelectorAll('.choice').forEach(b=>{if(b.dataset.c===String(q.ans))b.classList.add('right');else if(b.dataset.c===picked)b.classList.add('wrong')})}
+      answered=true;res.push(ok);
+      const ansTxt=q.type==='num'?`${q.pre||''}${q.ans}${q.suf?' '+q.suf:''}`:(q.chHTML?'':String(q.ans));
+      box.querySelector('#fb').innerHTML=`<div class="feedback ${ok?'ok':'no'}"><strong>${ok?P(['Correct!','Spot on!','Great thinking!','Yes!']):'Not quite.'}</strong>${!ok&&ansTxt?`<span>The answer is <b>${esc(ansTxt)}</b>.</span>`:''}<span>${esc(q.why||'')}</span></div>`;
+      check.textContent=i===qs.length-1?'See my score':'Next question';
+    };
+  }
+  function finish(){
+    const score=res.filter(Boolean).length,total=qs.length,st=starsFor(score,total);
+    const prev=scores[id];if(!prev||score>prev.best||prev.total!==total)scores[id]={best:Math.max(score,prev&&prev.total===total?prev.best:0),total};save();
+    document.getElementById('starCount').textContent=totalStars();
+    const msg=st===3?'Brilliant work. You have mastered this one.':st===2?'Very good. One more round could make it three stars.':st===1?'Good effort. Look at the worked examples again, then have another go.':'This one is tricky. Read the lesson together and try again.';
+    box.innerHTML=`<div class="result"><div class="big-stars">${starsSVG(st)}</div><h2>${score} out of ${total}</h2><p class="muted" style="max-width:46ch">${msg}</p><div class="actions" style="justify-content:center"><button class="btn" id="again">New questions</button><button class="btn ghost" id="home">Back to lessons</button></div></div>`;
+    box.querySelector('#again').onclick=()=>startPractice(id,kind,lv,l);
+    box.querySelector('#home').onclick=()=>{state.lesson=null;render();window.scrollTo({top:0})};
+  }
+  draw();
+}
+
+/* ---------- parent corner ---------- */
+function renderParent(){
+  const lv=LEVELS[state.level];
+  const checks=state.level==='y3'?['Say the months in order and tell how many days are in each (knuckle trick)','Read a time on a clock to the hour, half hour and quarter hour','Measure with cups and balance with cubes, and say which is more or less','Make a tally chart and read a column graph that goes up in 1s','Skip count by 2s, 5s, 10s and know the 2, 5 and 10 times tables']
+    :['Say the days of the week in order and know a fortnight is 14 days','Say the months in order','Read o\'clock and half past on an analogue clock','Say which of two things is heavier or holds more','Count tally marks in groups of 5'];
+  const plan=state.level==='y3'
+    ?[['1','Time and Calendar','Lesson 1.1 leap years and calendar patterns','Leftover-days trick for “what day will it be?”','Practise round 1.1. Mystery date game.'],
+      ['2','Time and Calendar','Lesson 1.2 clocks to the minute. Clock builder.','Past, to, digital and am/pm. How long is a minute?','Practise round 1.2.'],
+      ['3','Time and Calendar','Lesson 1.3 units of time and elapsed time','Timetable reading and journey planning','Practise round 1.3. Day diary.'],
+      ['4','Capacity and Mass','Lesson 2.1 standard units and benchmarks. Fill a litre.','Lesson 2.2 read the jug. Kitchen lab.','Practise rounds 2.1 and 2.2.'],
+      ['5','Capacity and Mass','Capacity problems: add, subtract, convert','Lesson 2.3 read the kitchen scale. Mass lab.','Pancake baking: measure and double.'],
+      ['6','Capacity and Mass','Mass problems: total mass, how much more','Mixed capacity and mass challenges','Practise round 2.3 and review.'],
+      ['7','Data Collection','Lesson 3.1 categorical and numerical. Plan a survey.','Collect data. Tally.','Practise round 3.1. Weather watch starts.'],
+      ['8','Data Collection','Lesson 3.2 picture graph with a key','Lesson 3.3 column graph with a scale','Graph your family survey data.'],
+      ['9','Data Collection','Interpret: most, least, how many more, total','Check the graph: fair or misleading?','Practise rounds 3.2 and 3.3.'],
+      ['10','Review and project','Family Cook-Up Day: plan and shop','Cook-Up Day: cook, pour and weigh','Year 3 mixed review.']]
+    :[['1','Time and Calendar','Lesson 1.1 days, weeks, fortnights','Fridge calendar counting','Practise round 1.1'],
+      ['2','Time and Calendar','Lesson 1.2 months and knuckle trick','Lesson 1.3 clocks to the quarter hour','Practise rounds 1.2 and 1.3'],
+      ['3','Capacity and Mass','Lesson 2.1 which holds more?','Lesson 2.2 heavier and lighter','Lesson 2.3 measuring fairly'],
+      ['4','Data Collection','Lesson 3.1 tally marks. Window watch.','Lesson 3.2 picture graphs','Lesson 3.3 column graphs'],
+      ['5','Review','Redo any lesson under 2 stars','Year 2 mixed review','Move on to Year 3 when the review gets 2+ stars']];
+  let h=`<div class="wrap" style="gap:22px"><section class="intro"><span class="eyebrow">For parents · ${lv.name}</span><h2>How to use this course</h2>
+  <p>Each lesson has a script for you to read aloud, a diagram, worked examples to talk through, a “your turn” task on paper, and a practice round Asmi can do on her own. Questions change every round, so she can repeat a lesson until she earns three stars. Stars and the checklist below are saved in this browser only.</p></section>
+  <section class="panel"><h3>Ready-to-go check (5 minutes)</h3><p class="muted">Can Asmi… If any box is a “not yet”, spend a few days on it first.</p><div class="checklist">${checks.map((c,i)=>{const k=state.level+'-'+i;return `<label><input type="checkbox" id="rc-${k}" data-k="${k}" ${ready[k]?'checked':''}><span>${esc(c)}</span></label>`}).join('')}</div></section>
+  <section class="panel"><h3>${state.level==='y3'?'10-week plan · 3 sessions a week, about 40 minutes each':'Plan for the rest of Term 4 · 3 sessions a week, about 30 minutes each'}</h3><div class="tablewrap"><table class="tt"><tr><th>Week</th><th>Topic</th><th>Session 1</th><th>Session 2</th><th>Session 3</th></tr>${plan.map(r=>`<tr>${r.map((c,i)=>`<td style="text-align:${i<2?'center':'left'}">${esc(c)}</td>`).join('')}</tr>`).join('')}</table></div></section>
+  <section class="panel hands"><h3>Hands-on activities</h3><div class="grid3">${Object.entries(HANDS[state.level]).map(([t,list])=>`<div><b>${esc(t)}</b><ul>${list.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>`).join('')}</div></section>
+  <section class="panel"><h3>Teaching tips</h3><div class="tablewrap"><table class="tt"><tr><th>Do this</th><th>Avoid this</th></tr>
+  <tr><td>Measure with real objects first, then talk about the numbers</td><td>Rushing to worksheets without hands-on measuring</td></tr>
+  <tr><td>Ask “How do you know?” and “Can you show me another way?”</td><td>Giving the answer too quickly. Wait 30 seconds.</td></tr>
+  <tr><td>Use number-line jumps for time and measures</td><td>Teaching tricks without understanding</td></tr>
+  <tr><td>Make mistakes safe: “Let’s test it and find out!”</td><td>Praising only correct answers</td></tr>
+  <tr><td>Cook, shop and travel together, and use the maths out loud</td><td>Keeping maths only at the table</td></tr></table></div>
+  <p class="muted" style="font-size:14px">Curriculum: Victorian Curriculum F–10 v2.0, Mathematics, Levels 2 and 3 (<a href="https://f10.vcaa.vic.edu.au/" target="_blank" rel="noopener" style="color:var(--sky)">f10.vcaa.vic.edu.au</a>).</p>
+  <div class="actions"><button class="btn ghost small" id="reset">Reset all stars</button><span id="resetMsg" class="muted" style="font-size:14px"></span></div></section></div>`;
+  view.innerHTML=h;
+  view.querySelectorAll('.checklist input').forEach(c=>c.onchange=()=>{ready[c.dataset.k]=c.checked;save()});
+  let armed=false;const rb=document.getElementById('reset');
+  rb.onclick=()=>{if(!armed){armed=true;rb.textContent='Tap again to confirm';document.getElementById('resetMsg').textContent='This clears every star on this device.';return}scores={};save();render()};
+}
+
+render();
+</script>
